@@ -82,8 +82,10 @@ unsigned long globaTime;
 int targetHoles[NUMTARGETS]; //sequential pin numbers of target holes, eg 0, 1, 2, 3...
 
 //global vars for bar movement
-int userSpeedLeft; //from get_left_user_input()
-int userSpeedRight;
+int userSpeedLeft = 0; //from get_left_user_input()
+int userSpeedRight = 0;
+int prevSpeedLeft = 0;
+int prevSpeedRight = 0;
 int barPosL = FLOOR;
 int barPosR = FLOOR;
 int barTilt = 0;
@@ -99,7 +101,29 @@ bool sped_up = false;
 
 /************END OF GLOBAL VARIABLES**********************/
 
+/**********HELPER FUNCTION PROTOTYPES******************/
+void waitToStartGame();
+void updateTarget();
+void resetBall();
+void resetGame();
+void idleTime();
+int smooth_distance (int num_samples);
+int sample_distance();
+bool beamBroken(int target);
+void ballEntry();
+void setBarSpeed();
+void moveBar();
+void resetBar();
+void updateLights(int lastHole, int newHole);
+void updateScore();
+void displayScore();
+void sethighScore();
+void powerdown_handler();
+void power_down_reverse_control (bool opposite);
+void power_down_increase_speed(bool speed_control);
+/******END OF HELPER FUNCTION PROTOTYPES***************/
 
+/**********START OF HELPER FUNCTION IMPLEMENTATIONS*******************/
 
 void waitToStartGame() {
   //wait and do nothing until someone presses "start"
@@ -132,7 +156,7 @@ void updateTarget() {
   
   targetPin += targetIncr;
 
-  if(targetPin > NUMTARGETHOLES){
+  if(targetPin > NUMTARGETS){
     targetPin = targetIncr;
   }
   
@@ -295,13 +319,11 @@ void ballEntry() {
 //changes the motor speed if user input speed changes
 void setBarSpeed() { 
   if(userSpeedLeft != prevSpeedLeft) {
-      motorL.setSpeed(userSpeed * SPEED_MULT + speedBoost);
+      motorL.setSpeed(userSpeedLeft * SPEED_MULT + speedBoost);
     }
   if(userSpeedRight != prevSpeedRight) {
-      motorR.setSpeed(userSpeed * SPEED_MULT + speedBoost);
+      motorR.setSpeed(userSpeedRight * SPEED_MULT + speedBoost);
     }
-  prevSpeedLeft = userSpeedLeft;
-  prevSpeedRight = userSpeedRight;
   prevSpeedLeft = userSpeedLeft;
   prevSpeedRight = userSpeedRight;
 }
@@ -473,6 +495,69 @@ void sethighScore() {
 }
 /************ END OF OUTPUT FUNCTIONS ***********/
 
+/************ START OF POWER DOWN FUNCTIONS ***********/
+void powerdown_handler(){
+  if(level <=7){
+    power_down_reverse_control(false);
+    power_down_increase_speed(false);
+  }else{
+    int powerdown = (int)random(0,2);
+    
+    switch(powerdown){
+      case 0:
+        power_down_reverse_control(true);
+        power_down_increase_speed(false);
+        break;
+      case 1:
+        power_down_reverse_control(false);
+        power_down_increase_speed(true);
+        break;
+      case 2:
+        power_down_reverse_control(true);
+        power_down_increase_speed(true);
+        break;
+      default:
+        power_down_reverse_control(false);
+        power_down_increase_speed(false);
+        break;
+    }
+  }
+}
+
+void power_down_reverse_control (bool opposite) {
+  if (opposite) {
+    //left -> now right
+    int trigPin1 = 8;
+    int echoPin1 = 7;
+    //right -> now left
+    int trigPin2 = 10;
+    int echoPin2 = 9;
+  } else {
+    //left (normal)
+    int trigPin1 = 10;
+    int echoPin1 = 9;
+    //right (normal)
+    int trigPin2 = 8;
+    int echoPin2 = 7;
+  }
+}
+
+
+void power_down_increase_speed(bool speed_control) {
+  //if speed_control is true, increase speed
+  //if false leave it alone
+
+  //sped_up is global in user_input
+  sped_up = speed_control; //moveBar() is not using this
+
+  speedBoost++; //increase speed by 1 rpm, used by moveBar()
+}
+
+
+/************ END OF POWER DOWN  FUNCTIONS ***********/
+
+/**********END OF HELPER FUNCTION IMPLEMENTATIONS******/
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600); // Starts the serial communication
@@ -550,66 +635,6 @@ void setup() {
   
   resetBar();
 }
-/************ START OF POWER DOWN FUNCTIONS ***********/
-void powerdown_handler(){
-  if(level <=7){
-    power_down_reverse_control(false);
-    power_down_increase_speed(false);
-  }else{
-    int powerdown = (int)random(0,2);
-    
-    switch(powerdown){
-      case 0:
-        power_down_reverse_control(true);
-        power_down_increase_speed(false);
-        break;
-      case 1:
-        power_down_reverse_control(false);
-        power_down_increase_speed(true);
-        break;
-      case 2:
-        power_down_reverse_control(true);
-        power_down_increase_speed(true);
-        break;
-      default:
-        power_down_reverse_control(false);
-        power_down_increase_speed(false);
-        break;
-    }
-  }
-}
-
-void power_down_reverse_control (bool opposite) {
-  if (opposite) {
-    //left -> now right
-    int trigPin1 = 8;
-    int echoPin1 = 7;
-    //right -> now left
-    int trigPin2 = 10;
-    int echoPin2 = 9;
-  } else {
-    //left (normal)
-    int trigPin1 = 10;
-    int echoPin1 = 9;
-    //right (normal)
-    int trigPin2 = 8;
-    int echoPin2 = 7;
-  }
-}
-
-
-void power_down_increase_speed(bool speed_control) {
-  //if speed_control is true, increase speed
-  //if false leave it alone
-
-  //sped_up is global in user_input
-  sped_up = speed_control; //moveBar() is not using this
-
-  speedBoost++; //increase speed by 1 rpm, used by moveBar()
-}
-
-
-/************ END OF POWER DOWN  FUNCTIONS ***********/
 
 void loop() {
 
