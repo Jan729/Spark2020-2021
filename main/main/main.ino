@@ -75,6 +75,10 @@ int targetPin = 0;
 bool targetBroken = false;
 bool bottomBroken = false;
 
+//global vars for pins for input buttons 
+int left_button = 7;
+int right_button = 8;
+
 //global variables for timing 
 unsigned long finishTime;  //time when the ball drops into target hole, resets each round
 unsigned long globaTime;
@@ -120,7 +124,7 @@ void displayScore();
 void sethighScore();
 void powerdown_handler();
 void power_down_reverse_control (bool opposite);
-void power_down_increase_speed(bool speed_control);
+void power_down_change_speed();
 /******END OF HELPER FUNCTION PROTOTYPES***************/
 
 /**********START OF HELPER FUNCTION IMPLEMENTATIONS*******************/
@@ -326,6 +330,8 @@ void setBarSpeed() {
     }
   prevSpeedLeft = userSpeedLeft;
   prevSpeedRight = userSpeedRight;
+  userSpeedLeft = userSpeedLeft * SPEED_MULT + speedBoost;
+  userSpeedRight = userSpeedRight * SPEED_MULT + speedBoost;
 }
 
 //will move right motor and left motor 1 step each time moveBar() is called
@@ -499,58 +505,38 @@ void sethighScore() {
 void powerdown_handler(){
   if(level <=7){
     power_down_reverse_control(false);
-    power_down_increase_speed(false);
   }else{
     int powerdown = (int)random(0,2);
     
     switch(powerdown){
       case 0:
         power_down_reverse_control(true);
-        power_down_increase_speed(false);
         break;
       case 1:
         power_down_reverse_control(false);
-        power_down_increase_speed(true);
+        power_down_change_speed();
         break;
       case 2:
         power_down_reverse_control(true);
-        power_down_increase_speed(true);
+        power_down_change_speed(true);
         break;
       default:
         power_down_reverse_control(false);
-        power_down_increase_speed(false);
         break;
     }
   }
 }
 
-void power_down_reverse_control (bool opposite) {
-  if (opposite) {
-    //left -> now right
-    int trigPin1 = 8;
-    int echoPin1 = 7;
-    //right -> now left
-    int trigPin2 = 10;
-    int echoPin2 = 9;
-  } else {
-    //left (normal)
-    int trigPin1 = 10;
-    int echoPin1 = 9;
-    //right (normal)
-    int trigPin2 = 8;
-    int echoPin2 = 7;
-  }
+void power_down_reverse_control () {
+  int temp_left = left_button;
+  left_button = right_button;
+  right_button = temp_left;
 }
 
 
-void power_down_increase_speed(bool speed_control) {
-  //if speed_control is true, increase speed
-  //if false leave it alone
-
-  //sped_up is global in user_input
-  sped_up = speed_control; //moveBar() is not using this
-
-  speedBoost++; //increase speed by 1 rpm, used by moveBar()
+void power_down_change_speed() { 
+  int increase  = (int)random(1, 3);
+  speedBoost = speedBoost + increase; 
 }
 
 
@@ -568,11 +554,9 @@ void setup() {
     targetHoles[i] = i;
   }
 
-  //what is this?
-  pinMode(8, OUTPUT);
-
-  pinMode(echoPin, INPUT); //echoPin, for distance sensor
-  pinMode(trigPin, OUTPUT); //trigggerPin, for distance sensor
+  // Game Input Buttons to Move Bar 
+  pinMode(left_button, INPUT);
+  pinMode(right_button, INPUT);
 
   pinMode(11, OUTPUT); //IR LEDs. keep on at all times
   pinMode(12, OUTPUT);
@@ -651,8 +635,8 @@ void loop() {
     //TODO: Work out where to call start and end times (NOT DONE)
     finishTime = millis(); //might not need here depending on when updateTarget is called. 
   
-    get_left_user_input();
-    get_right_user_input();
+    get_left_user_input(); // needs to be written, use global var left_button
+    get_right_user_input();// needs to be written, use global var right_button
     moveBar();
     ballEntry();
     updatescore();
