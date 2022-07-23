@@ -389,7 +389,7 @@ void resetBar()
   while (barPosL < BALL_RETURN_HEIGHT)
   {
   //when bar triggers the bar sensor, reset the bar's position variables  
-  if(digitalRead(BAR_SENSOR_PIN) == HIGH) {
+  if(digitalRead(BAR_SENSOR_PIN) == LOW) {
      barPosL = FLOOR;
      barPosR = FLOOR;
   }
@@ -400,7 +400,7 @@ void resetBar()
    barPosR+= 1;
   }
 
-  //resetBall(); //matt has the code for this function?
+  resetBall();
 
   //lift bar to start of playing area
   while (barPosL > FLOOR)
