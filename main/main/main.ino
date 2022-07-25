@@ -81,7 +81,7 @@ int right_button = 8;
 
 //global variables for timing 
 unsigned long finishTime;  //time when the ball drops into target hole, resets each round
-unsigned long globaTime;
+unsigned long globalTime;
 
 int targetHoles[NUMTARGETS]; //sequential pin numbers of target holes, eg 0, 1, 2, 3...
 
@@ -197,7 +197,7 @@ void resetGame(){
     resetBar();
     resetBall();
     finishTime = millis();
-    globalTIme = millis();
+    globalTime = millis();
     updateScore();
     displayScore();
     digitalWrite(targetPin, HIGH);
