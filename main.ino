@@ -21,7 +21,7 @@ int distance;
 bool playingGame = true; //true if someone is playing, false if game is idle
 
 int score = 0;
-int targetPin = 0;
+int targetLEDPin = 0;
 bool targetBroken = false;
 bool bottomBroken = false;
 
@@ -255,7 +255,7 @@ void loop() {
   resetBall();
   score = 0;
 
-  targetPin = 0; //remove when finished updateTarget()
+  targetLEDPin = 0; //remove when finished updateTarget()
   //updateTarget(); //choose 1st target
 
   //dummy counter for mimicking a game loop
@@ -271,7 +271,7 @@ void loop() {
     moveBar();
     ballEntry();
     checkIfGameOver();
-    targetBroken=beamBroken(targetPin);
+    targetBroken=beamBroken(targetLEDPin);
     bottomBroken=beamBroken(BOTTOMPIN);
 
 

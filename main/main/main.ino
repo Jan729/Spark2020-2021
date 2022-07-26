@@ -65,13 +65,13 @@ int distance;
 RunningAverage holes[35];
 
 bool playingGame = true; //true if someone is playing, false if game over
-
+bool winGame = false; 
 int score = 0;
 int targetDifficulty = 0;
 int highscore = 0;
 int level = 0;
-
-int targetPin = 0;
+int targetLEDPin = 0;
+int targetSensorPin = 0;
 bool targetBroken = false;
 bool bottomBroken = false;
 
@@ -81,7 +81,7 @@ int right_button = 8;
 
 //global variables for timing 
 unsigned long finishTime;  //time when the ball drops into target hole, resets each round
-unsigned long globalTime;
+unsigned long idleTime;
 
 int targetHoles[NUMTARGETS]; //sequential pin numbers of target holes, eg 0, 1, 2, 3...
 
@@ -110,7 +110,7 @@ void waitToStartGame();
 void updateTarget();
 void resetBall();
 void resetGame();
-void idleTime();
+void checkIdleTime();
 int smooth_distance (int num_samples);
 int sample_distance();
 bool beamBroken(int target);
@@ -156,15 +156,17 @@ void updateTarget() {
 
   int targetIncr = (int)random(1,3);
 
-  int oldTarget = targetPin;
+  int oldTarget = targetLEDPin;
   
-  targetPin += targetIncr;
+  targetLEDPin += targetIncr;
+  targetSensorPin += targetIncr;
 
-  if(targetPin > NUMTARGETS){
-    targetPin = targetIncr;
+  if(targetLEDPin > NUMTARGETS){
+    playingGame = false;
+    winGame = true; //win the game
   }
-  
-  updateLights(oldTarget, targetPin);
+
+  updateLights(oldTarget, targetLEDPin);
 }
 
 void resetBall() {
@@ -190,21 +192,19 @@ void resetBall() {
 void resetGame(){
     level = 0;
     score = 0;
-    targetPin = 0;
+    targetLEDPin = 0;
     targetDifficulty = 0;
     targetBroken = false;
     bottomBroken = false;
     resetBar();
     resetBall();
-    finishTime = millis();
-    globalTime = millis();
-    updateScore();
+    idleTime = millis();
     displayScore();
-    digitalWrite(targetPin, HIGH);
+    digitalWrite(targetLEDPin, HIGH);
 }
 
-void idleTime(){
-  if (globalTime/1000 > 5){ // 5 minutes of idle
+void checkIdleTime(){
+  if (idleTime/60000 > 5) // 5 minutes of idle
     playingGame = false;
 }
 
@@ -290,17 +290,14 @@ bool beamBroken(int target)
 
 void ballEntry() {
 
-  targetBroken=beamBroken(targetPin);
+  targetBroken = beamBroken(targetLEDPin);
   bottomBroken=beamBroken(BOTTOMPIN);
 
-  int fellIntoTargetHole = true; //TODO: change to false
-  int fellIntoBadHole = false; 
-
   if (targetBroken) { //ball fell in good hole
+    targetBroken = false;
     resetBar();
     resetBall();
 
-    //updateHighScore();
     updateTarget();
     finishTime = millis();
     updateScore();
@@ -312,7 +309,6 @@ void ballEntry() {
 
   }
 
-  resetBar();
 }
 
 /************ END OF BALL DETECTION FUNCTIONS ***********/
@@ -448,10 +444,8 @@ int gpio_num_array[10] = {  B01111110,    // 0
                          
 void updateScore() {
   targetDifficulty += 1;
-    
-  score += finishtime/1500 * targetDifficulty/5;
+  score += (30000 - finishTime)/1500 * targetDifficulty/5 ; //TODO: finish this code
   
-  delay(1000);
   displayScore();
   sethighScore();
 }
@@ -622,7 +616,6 @@ void setup() {
 
 void loop() {
 
-  resetGame(); //sets bar, ball, score, lights for initial game start
   waitToStartGame(); //wait for user to start game and set PlayingGame = true
 
   while (playingGame) {
@@ -639,8 +632,12 @@ void loop() {
     get_right_user_input();// needs to be written, use global var right_button
     moveBar();
     ballEntry();
-    updatescore();
-    idleTime();
+    checkIdleTime();
 
   }
+
+  if (winGame) {
+    digitalWrite(targetLEDPin, LOW); 
+    Serial.println("Yay you win !!");
+  } 
 }
