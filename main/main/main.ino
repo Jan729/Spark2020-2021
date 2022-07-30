@@ -125,6 +125,9 @@ void sethighScore();
 void powerdown_handler();
 void power_down_reverse_control (bool opposite);
 void power_down_change_speed();
+void flashAllTargetLEDs();
+void displayWinMessage();
+void displayLoseMessage();
 /******END OF HELPER FUNCTION PROTOTYPES***************/
 
 /**********START OF HELPER FUNCTION IMPLEMENTATIONS*******************/
@@ -493,6 +496,65 @@ void sethighScore() {
     int highThird = (highscore-highFirst-highSecond);
   }
 }
+
+void flashAllTargetLEDs() {
+    //TODO Matt: index target LEDs from top to bottom
+    // and uncomment this loop
+    //for(int targetLED = <index of last hole>; targetLED >= <index of first hole>; targetLED--) {
+    // digitalWrite(targetLED, HIGH);
+    // delay(100);
+    // digitalWrite(targetLED, LOW);
+    //}
+}
+
+void displayWinMessage() {
+  for (int i=1; i<=3; i++) {
+    sevseg1.setChars("y");
+    sevseg1.refreshDisplay(); 
+    sevseg2.setChars("o");
+    sevseg2.refreshDisplay(); 
+    sevseg3.setNumber("u");
+    sevseg3.refreshDisplay(); 
+    delay(500);
+    sevseg1.setChars("w");
+    sevseg1.refreshDisplay(); 
+    sevseg2.setChars("i");
+    sevseg2.refreshDisplay(); 
+    sevseg3.setNumber("n");
+    sevseg3.refreshDisplay(); 
+    delay(500);
+  }
+}
+
+void displayLoseMessage() {
+  for (int i=1; i<=3; i++) {
+    sevseg1.setChars("o");
+    sevseg1.refreshDisplay(); 
+    sevseg2.setChars("h");
+    sevseg2.refreshDisplay(); 
+    sevseg3.blank();
+    sevseg3.refreshDisplay(); 
+    delay(500);
+    sevseg1.setChars("n");
+    sevseg1.refreshDisplay(); 
+    sevseg2.setChars("o");
+    sevseg2.refreshDisplay(); 
+    delay(500);
+    sevseg1.setChars("s");
+    sevseg1.refreshDisplay(); 
+    sevseg2.setChars("o");
+    sevseg2.refreshDisplay(); 
+    delay(500);
+    sevseg1.setChars("s");
+    sevseg1.refreshDisplay(); 
+    sevseg2.setChars("a");
+    sevseg2.refreshDisplay(); 
+    sevseg3.setNumber("d");
+    sevseg3.refreshDisplay(); 
+    delay(500);
+  }
+}
+
 /************ END OF OUTPUT FUNCTIONS ***********/
 
 /************ START OF POWER DOWN FUNCTIONS ***********/
@@ -638,6 +700,12 @@ void loop() {
 
   if (winGame) {
     digitalWrite(targetLEDPin, LOW); 
-    Serial.println("Yay you win !!");
-  } 
+    flashAllTargetLEDs();
+    displayWinMessage();
+  } else {
+    flashAllTargetLEDs();
+    displayLoseMessage();
+  }
+
+  displayScore(); //replace win/lose message with player score
 }
