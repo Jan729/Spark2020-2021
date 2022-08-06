@@ -66,6 +66,7 @@ RunningAverage holes[35];
 
 bool playingGame = true; //true if someone is playing, false if game over
 bool winGame = false; 
+bool loseGame = false;
 int score = 0;
 int targetDifficulty = 0;
 int highscore = 0;
@@ -148,10 +149,6 @@ void waitToStartGame() {
   //Serial.println("wait to start the game. pretend someone starts playing game");
 
 }
-
-
-
-
 
 void updateTarget() {
   level++; 
@@ -308,6 +305,7 @@ void ballEntry() {
     
   } else if (bottomBroken) { //ball fell in bad hole  
     playingGame = false;
+    loseGame = true;
     resetGame();
 
   }
@@ -528,6 +526,28 @@ void displayWinMessage() {
 
 void displayLoseMessage() {
   for (int i=1; i<=3; i++) {
+    sevseg1.setChars("y");
+    sevseg1.refreshDisplay(); 
+    sevseg2.setChars("o");
+    sevseg2.refreshDisplay(); 
+    sevseg3.setNumber("u");
+    sevseg3.refreshDisplay(); 
+    delay(500);
+    sevseg1.setChars("l");
+    sevseg1.refreshDisplay(); 
+    sevseg2.setChars("o");
+    sevseg2.refreshDisplay(); 
+    sevseg3.setNumber("s");
+    sevseg3.refreshDisplay(); 
+    //TODO -> DO WE HAVE A 4rth SEVEN SEG OR NO??
+    sevseg4.setNumber("e");
+    sevseg4.refreshDisplay(); 
+    delay(500);
+  }
+}
+
+void displayLoseMessage() {
+  for (int i=1; i<=3; i++) {
     sevseg1.setChars("o");
     sevseg1.refreshDisplay(); 
     sevseg2.setChars("h");
@@ -702,7 +722,10 @@ void loop() {
     digitalWrite(targetLEDPin, LOW); 
     flashAllTargetLEDs();
     displayWinMessage();
-  } else {
+  } else if (loseGame){
+    digitalWrite(targetLEDPin, LOW); 
+
+  }else {
     flashAllTargetLEDs();
     displayLoseMessage();
   }
