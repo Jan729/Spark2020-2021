@@ -537,11 +537,15 @@ void displayLoseMessage() {
     sevseg1.refreshDisplay(); 
     sevseg2.setChars("o");
     sevseg2.refreshDisplay(); 
-    sevseg3.setNumber("s");
+    sevseg3.setNumber("-");
     sevseg3.refreshDisplay(); 
-    //TODO -> DO WE HAVE A 4rth SEVEN SEG OR NO??
-    sevseg4.setNumber("e");
-    sevseg4.refreshDisplay(); 
+    delay(500);
+    sevseg1.setNumber("e");
+    sevseg1.refreshDisplay(); 
+    sevseg2.setChars("!");
+    sevseg2.refreshDisplay(); 
+    sevseg3.setNumber("!");
+    sevseg3.refreshDisplay(); 
     delay(500);
   }
 }
