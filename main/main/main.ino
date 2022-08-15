@@ -13,6 +13,8 @@
 #include "RunningAverage.h"
 #include "SevSeg.h"
 #include "Wire.h"
+#include <Wire.h>
+#include "Adafruit_MCP23017.h"
 //these can be changed and we need 
 //two for each IR sensor
 
@@ -56,6 +58,14 @@ Stepper motorL = Stepper(MOTOR_L_STEP, MOTOR_L_DIR);
 /************END OF CONSTANTS*********************/
 
 /************GLOBAL VARIABLES**********************/
+Adafruit_MCP23017 mcp1; //shift registers; 8 of them, each with 16 pins
+Adafruit_MCP23017 mcp2;
+Adafruit_MCP23017 mcp3;
+Adafruit_MCP23017 mcp4;
+Adafruit_MCP23017 mcp5;
+Adafruit_MCP23017 mcp6;
+Adafruit_MCP23017 mcp7;
+Adafruit_MCP23017 mcp8;
 
 // time for sound wave to travel to object and bounce back
 long duration;
@@ -628,6 +638,34 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600); // Starts the serial communication
 
+  mcp1.begin(0);
+  mcp2.begin(1);
+  mcp3.begin(2);
+  mcp4.begin(3);
+  mcp5.begin(4);
+  mcp6.begin(5);
+  mcp7.begin(6);
+  mcp8.begin(7);
+  
+  for (int i=0; i<16; i++) {
+    mcp1.pinMode(i, INPUT);
+    mcp1.pullUp(i, HIGH);
+    mcp2.pinMode(i, INPUT);
+    mcp2.pullUp(i, HIGH);
+    mcp3.pinMode(i, INPUT);
+    mcp3.pullUp(i, HIGH);
+    mcp4.pinMode(i, INPUT);
+    mcp4.pullUp(i, HIGH);
+    mcp5.pinMode(i, INPUT);
+    mcp5.pullUp(i, HIGH);
+    mcp6.pinMode(i, INPUT);
+    mcp6.pullUp(i, HIGH);
+    mcp7.pinMode(i, INPUT);
+    mcp7.pullUp(i, HIGH);
+    mcp8.pinMode(i, INPUT);
+    mcp8.pullUp(i, HIGH);
+  }
+  
   for (int i = IROFFSET; i < NUMTARGETS+IROFFSET; i++) {
     pinMode(i, INPUT); //IR receivers, one pin per target hole
     digitalWrite(i, HIGH); // turn on the pullup
