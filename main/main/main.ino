@@ -508,11 +508,11 @@ void sethighScore() {
 void flashAllTargetLEDs() {
     //TODO Matt: index target LEDs from top to bottom
     // and uncomment this loop
-    //for(int targetLED = <index of last hole>; targetLED >= <index of first hole>; targetLED--) {
-    // digitalWrite(targetLED, HIGH);
-    // delay(100);
-    // digitalWrite(targetLED, LOW);
-    //}
+    for(int targetLED = IROFFSET + NUMTARGETS; targetLED >= IROFFSET; targetLED--) {
+     digitalWrite(targetLED, HIGH);
+     delay(100);
+     digitalWrite(targetLED, LOW);
+    }
 }
 
 void displayWinMessage() {
@@ -762,7 +762,7 @@ void loop() {
 
   if (winGame) {
     digitalWrite(targetLEDPin, LOW); 
-    flashAllTargetLEDs();
+    AllTargetLEDs();
     displayWinMessage();
   } else if (loseGame){
     digitalWrite(targetLEDPin, LOW); 
