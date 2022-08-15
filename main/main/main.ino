@@ -4,7 +4,7 @@
 */
 
 /**********CONSTANTS*****************************/
-#define SENSORPIN 4
+#define SENSORPIN 0
 #define BOTTOMPIN 13
 #define SCOREINCREASE 10
 #define NUMTARGETS 35
@@ -278,7 +278,24 @@ bool beamBroken(int target)
 
   // variables will change: // 1 = unbroked, 0 = broke 
   int sensorState;
-  sensorState = digitalRead(SENSORPIN);
+  
+  //sensorState = digitalRead(SENSORPIN);
+  
+  if(SENSORPIN < 16)
+  {
+    sensorState = mcp1.digitalRead(SENSORPIN%16)
+  }
+  
+  else if(16 <= SENSORPIN < 32)
+  {
+    sensorState = mcp2.digitalRead(SENSORPIN%16)
+  }
+  
+  else
+  {
+    sensorState = mcp3.digitalRead(SENSORPIN%16)
+  }
+  
 
   //note that the array index may need to be changed
   //depending on the actual value of the sensorpin
@@ -508,10 +525,22 @@ void sethighScore() {
 void flashAllTargetLEDs() {
     //TODO Matt: index target LEDs from top to bottom
     // and uncomment this loop
-    for(int targetLED = IROFFSET + NUMTARGETS; targetLED >= IROFFSET; targetLED--) {
-     digitalWrite(targetLED, HIGH);
+    for(int i = 15; i <=0 ; i--) {
+     mcp3.digitalWrite(i, HIGH);
      delay(100);
-     digitalWrite(targetLED, LOW);
+     mcp4.digitalWrite(i, LOW);
+    }
+  
+  for(int i = 15; i <=0 ; i--) {
+     mcp2.digitalWrite(i, HIGH);
+     delay(100);
+     mcp2.digitalWrite(i, LOW);
+    }
+  
+  for(int i = 15; i <=0 ; i--) {
+     mcp1.digitalWrite(i, HIGH);
+     delay(100);
+     mcp1.digitalWrite(i, LOW);
     }
 }
 
