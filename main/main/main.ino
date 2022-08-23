@@ -20,7 +20,7 @@
 
 //START OF PIN DECLARATIONS
 int IRSensor = 2; // connect ir sensor to arduino pin 2
-int LED = 13; // conect Led to arduino pin 13
+int LED = 13; // connect Led to arduino pin 13
 
 #define BAR_SENSOR_PIN 12
 #define MOTOR_R_STEP 14
