@@ -219,51 +219,13 @@ void checkIdleTime(){
 }
 
 /****** USER INPUT FUNCTIONS ****/
-int smooth_distance (int num_samples) {
-  int value = 0;
-  int current_distance = 0;
-  for (int i = 0; i < num_samples; i++) {
-    current_distance = sample_distance();
-    if (current_distance > 0 && current_distance < 25) {
-      value = value + sample_distance();
-      //Serial.print("Good Reading.\n");
-    } else {
-      //Serial.print("Bad Reading.");
-      //take another sample of the data if there was a bad read
-      //probably going to need to remove this
-      //but it works well to test averages
-      i--;
-    }
+void get_left_user_input() {
+	userSpeedLeft = digitalRead(left_button);
 
-  }
-
-  return (value / num_samples);
 }
+void get_right_user_input() {
+	userSpeedRight = digitalRead(right_button);
 
-int sample_distance() {
-  int current_duration;
-  // Clears the trigPin
-  digitalWrite(trigPin, LOW);
-  delayMicroseconds(2);
-
-  // Sets the trigPin on HIGH state for 10 micro seconds
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);
-
-  // Reads the echoPin, returns the sound wave travel time in microseconds
-  //wait max 50,000 microseconds before reading
-  //may have to change this value
-  current_duration = pulseIn(echoPin, HIGH, 50000);
-
-  // Calculating the distance
-  current_distance = current_duration * 0.034 / 2;
-
-  // Prints the distance on the Serial Monitor
-  //Serial.print("Distance: ");
-  //Serial.println(current_distance);
-
-  return current_distance;
 }
 
 /****** END OF USER INPUT FUNCTIONS ****/
@@ -781,8 +743,8 @@ void loop() {
     //TODO: Work out where to call start and end times (NOT DONE)
     finishTime = millis(); //might not need here depending on when updateTarget is called. 
   
-    get_left_user_input(); // needs to be written, use global var left_button
-    get_right_user_input();// needs to be written, use global var right_button
+    get_left_user_input(); 
+    get_right_user_input();
     moveBar();
     ballEntry();
     checkIdleTime();
