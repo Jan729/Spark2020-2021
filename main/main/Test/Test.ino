@@ -1,32 +1,44 @@
-int IRSensor = A5; // connect ir sensor to arduino pin 2
-int LED = 13; // conect Led to arduino pin 13
+int IRSensor = A5; // connect ir sensor to arduino pin A5
+int LED = 12; // conect Led to arduino pin 12
 
-// youtube: https://www.youtube.com/watch?v=FgiSbwKplmU&ab_channel=PraveenDehari
+// circuit: https://www.youtube.com/watch?v=FgiSbwKplmU&ab_channel=PraveenDehari
+// code: https://learn.adafruit.com/ir-breakbeam-sensors/arduino
 
-int sensorValue = 0;
 
-void setup() 
-{
+
+int sensorValue = 0, lastState = 0;
+
+void setup() {
   // initialize serial communications at 9600 bps:
   Serial.begin(9600);
 
-  pinMode (LED, OUTPUT); // Led pin OUTPUT
+  pinMode(LED, OUTPUT); // led pin as OUTPUT
+  pinMode(IRSensor, INPUT); // ir sensor pin as INPUT
+  digitalWrite(IRSensor, HIGH); // turn on the pullup
 }
 
 
-void loop(){
+void loop() {
   // read the analog in value:
   sensorValue = analogRead(IRSensor);
 
   Serial.print("sensor = " );
   Serial.println(sensorValue);
 
-  delay(200);
-
-  if(sensorValue > 500){
-    digitalWrite(LED,1);
+  if (IRSensor == LOW){
+    //turn LED on:
+    digitalWrite(LED, HIGH);
   }else{
-    digitalWrite(LED,0);
+    digitalWrite(LED, LOW);
+  }
+
+
+  if (IRSensor && !lastState) {
+    Serial.println("Unbroken");
+  } 
+  if (!IRSensor && lastState) {
+    Serial.println("Broken");
   }
   
+  lastState = IRSensor;
 }
