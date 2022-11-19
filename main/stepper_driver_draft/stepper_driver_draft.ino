@@ -55,9 +55,9 @@
 #define FLOOR 8888             //bottom of the playing area, not actually the floor
 #define BALL_RETURN_HEIGHT 99999 //lowest height of bar, where bar will pick up ball
 #define MAX_BAR_TILT 6400         //maximum vertical slope of bar, aka barPosRight - barPosLeft
-#define MAX_SPEED 100 //note 10 is the fastest for 28byj
-#define STEP_INCR 100 //steps taken on each loop() iteration
-#define STEPS_PER_REV 800//DRV //use 2048 for 28byj stepper with ULN2003
+#define MAX_SPEED 200 //note 10 is the fastest for 28byj
+#define STEP_INCR 50 //steps taken on each loop() iteration
+#define STEPS_PER_REV 800 //DRV //use 2048 for 28byj stepper with ULN2003
 #define SPEED_MULT 5           //multiply user input value with this number to set desired stepper speed
 #define BALL_RETURN_DELAY 2000 //time to wait until a new ball has rolled onto bar
 //distance sensors code will give the motors a number within the range [-3, 3]
@@ -122,6 +122,8 @@ int speedBoost = 1; //increment this number to increase the bar speed
 #define R_CEIL A2
 #define MAX_TILT_REACHED A1
 
+const uint8_t JoystickDownPin = 10; //joystick direction
+
 bool swapControls = false;
 int prevSwapReading = LOW;
 
@@ -150,9 +152,11 @@ void setup()
   pinMode(L_CEIL, OUTPUT);
   pinMode(R_CEIL, OUTPUT);
   pinMode(MAX_TILT_REACHED, OUTPUT);
-  // Serial.begin(9600);
+   Serial.begin(9600);
 
   //resetBar();
+
+  pinMode(JoystickDownPin, INPUT_PULLUP);
 }
 
 void loop()
@@ -162,9 +166,13 @@ void loop()
   {
     userInputRight = 1;
   }
-  else if (digitalRead(R_DOWN) == HIGH)
+
+  // TODO replace all variables with joystick values
+  // digitalRead(JoystickDownPin) == LOW)
+  else if (digitalRead(R_DOWN  == HIGH))
   {
     userInputRight = -1;
+    
   }
   else
   {
@@ -203,21 +211,9 @@ void loop()
   //     resetBar();
   //   }
 
-
-  
-  // TODO replace with real power down code
-    //pressing 'swap' button will toggle left and right controls
-   if (digitalRead(SWAP) == LOW && prevSwapReading == HIGH)
-   {
-     swapControls = !swapControls;
-   }
-      prevSwapReading = digitalRead(SWAP);
-      
-  if (swapControls) {
-    moveBarSwapped();
-  } else {
+  // TO REMEMBER: no need for swap. user input variables will swap it for us
     moveBar();
-  }
+
 }
 
 void setBarSpeed() {
