@@ -245,17 +245,17 @@ bool beamBroken(int target)
   
   if(SENSORPIN < 16)
   {
-    sensorState = mcp1.digitalRead(SENSORPIN%16)
+    sensorState = mcp1.digitalRead(targetSensorPin%16)
   }
   
   else if(16 <= SENSORPIN < 32)
   {
-    sensorState = mcp2.digitalRead(SENSORPIN%16)
+    sensorState = mcp2.digitalRead(targetSensorPin%16)
   }
   
   else
   {
-    sensorState = mcp3.digitalRead(SENSORPIN%16)
+    sensorState = mcp3.digitalRead(targetSensorPin%16)
   }
   
 
@@ -490,7 +490,7 @@ void flashAllTargetLEDs() {
     for(int i = 15; i <=0 ; i--) {
      mcp3.digitalWrite(i, HIGH);
      delay(100);
-     mcp4.digitalWrite(i, LOW);
+     mcp3.digitalWrite(i, LOW);
     }
   
   for(int i = 15; i <=0 ; i--) {
