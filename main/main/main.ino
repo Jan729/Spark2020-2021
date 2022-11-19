@@ -187,7 +187,7 @@ void resetBall() {
     const int stepsPerRevolution=800; //not used but for reference
     int stepsFor30Degrees=67; //800*(30/360) rounded as int
 
-    Stepper myStepper(stepsPerRevolution,2,3); //need to make sure pins (2,3) are consistent with pin declarations in main***
+    Stepper myStepper(stepsPerRevolution,RESET_MOTOR_STEP,RESET_MOTOR_DIR); //need to make sure pins are consistent with pin declarations in main***
     
     myStepper.setSpeed(speed); //setSpeed only take a positive number
     myStepper.step(stepsFor30Degrees); //rotate 30 degrees
