@@ -7,6 +7,7 @@ int LED = 12; // conect Led to arduino pin 12
 
 
 int sensorValue = 0, lastState = 0;
+int threshold = 200;
 
 void setup() {
   // initialize serial communications at 9600 bps:
@@ -25,7 +26,7 @@ void loop() {
   Serial.print("sensor = " );
   Serial.println(sensorValue);
 
-  if (IRSensor == LOW){
+  if (sensorValue > threshold){
     //turn LED on:
     digitalWrite(LED, HIGH);
   }else{
@@ -33,12 +34,12 @@ void loop() {
   }
 
 
-  if (IRSensor && !lastState) {
-    Serial.println("Unbroken");
-  } 
-  if (!IRSensor && lastState) {
-    Serial.println("Broken");
-  }
-  
-  lastState = IRSensor;
+//  if (IRSensor && !lastState) {
+//    Serial.println("Unbroken");
+//  } 
+//  if (!IRSensor && lastState) {
+//    Serial.println("Broken");
+//  }
+//  
+//  lastState = IRSensor;
 }
