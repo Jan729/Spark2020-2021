@@ -4,7 +4,7 @@
   
   IMPORTANT: If you don't have a driver connected to your arduino and directly plugged the stepper into
             your arduino instead, uncomment the code labeled "without driver" and 
-            comment out the code labeled "with driver"
+            comment out the code labeled "with driver"mo
 
   
   Assumptions:
@@ -52,12 +52,12 @@
 //EXPERIMENTAL VALUES - will need to adjust as we prototype
 
 #define CEILING 0                //highest height of bar
-#define FLOOR 10000             //bottom of the playing area, not actually the floor
-#define BALL_RETURN_HEIGHT 11000 //lowest height of bar, where bar will pick up ball
-#define MAX_BAR_TILT 200         //maximum vertical slope of bar, aka barPosRight - barPosLeft
-#define MAX_SPEED 10 //10 is the fastest 28byj
-#define STEP_INCR 1 //steps taken on each loop() iteration
-#define STEPS_PER_REV 2048 //only for 28byj stepper with ULN2003 driver
+#define FLOOR 8888             //bottom of the playing area, not actually the floor
+#define BALL_RETURN_HEIGHT 99999 //lowest height of bar, where bar will pick up ball
+#define MAX_BAR_TILT 6400         //maximum vertical slope of bar, aka barPosRight - barPosLeft
+#define MAX_SPEED 100 //note 10 is the fastest for 28byj
+#define STEP_INCR 100 //steps taken on each loop() iteration
+#define STEPS_PER_REV 800//DRV //use 2048 for 28byj stepper with ULN2003
 #define SPEED_MULT 5           //multiply user input value with this number to set desired stepper speed
 #define BALL_RETURN_DELAY 2000 //time to wait until a new ball has rolled onto bar
 //distance sensors code will give the motors a number within the range [-3, 3]
@@ -78,16 +78,30 @@ int barTilt = 0;
 int speedBoost = 1; //increment this number to increase the bar speed
 
 ////only for 28byj stepper with ULN2003 driver
-#define RT_COIL_1A 4
-#define RT_COIL_1B 5
-#define RT_COIL_2A 6
-#define RT_COIL_2B 7
-#define LT_COIL_1A 10
-#define LT_COIL_1B 11
-#define LT_COIL_2A 12
-#define LT_COIL_2B 13
-Stepper motorR = Stepper(STEPS_PER_REV, RT_COIL_1A, RT_COIL_1B, RT_COIL_2A, RT_COIL_2B);
-Stepper motorL = Stepper(STEPS_PER_REV, LT_COIL_1A, LT_COIL_1B, LT_COIL_2A, LT_COIL_2B);
+// #define RT_COIL_1A 4 
+// #define RT_COIL_1B 5
+// #define RT_COIL_2A 6
+// #define RT_COIL_2B 7
+// #define LT_COIL_1A 10
+// #define LT_COIL_1B 11
+// #define LT_COIL_2A 12
+// #define LT_COIL_2B 13
+// Stepper motorR = Stepper(STEPS_PER_REV, RT_COIL_1A, RT_COIL_1B, RT_COIL_2A, RT_COIL_2B);
+// Stepper motorL = Stepper(STEPS_PER_REV, LT_COIL_1A, LT_COIL_1B, LT_COIL_2A, LT_COIL_2B);
+
+// TODO change to DRV drivers
+// DIR pin is in the opposite corner and on the same long edge as the pot
+// STP is right next to DIR
+// pull RST and SLP to 5V to activate driver
+// note int stepsFor30Degrees=67; //800*(30/360) rounded as int
+
+  #define DIR_R 2
+  #define STEP_R 3
+  #define DIR_L 4
+  #define STEP_L 5
+
+  Stepper motorR = Stepper(STEPS_PER_REV, STEP_R, DIR_R);
+  Stepper motorL = Stepper(STEPS_PER_REV, STEP_L, DIR_L);
 
 /***************************************/
 
@@ -96,11 +110,11 @@ Stepper motorL = Stepper(STEPS_PER_REV, LT_COIL_1A, LT_COIL_1B, LT_COIL_2A, LT_C
 
 //FOR PROTOTYPING ONLY. pushbuttons and LED pins
 //these should actually be global variables from other parts of code
-#define R_UP 9 //pushbuttons
-#define R_DOWN 8
-#define L_UP 3
-#define L_DOWN 2
-#define SWAP A0
+#define L_UP 6 //pushbuttons
+#define L_DOWN 7
+#define R_UP 8
+#define R_DOWN 9
+#define SWAP 10
 
 #define L_FLOOR A5 //LEDs
 #define L_CEIL A4
@@ -136,7 +150,7 @@ void setup()
   pinMode(L_CEIL, OUTPUT);
   pinMode(R_CEIL, OUTPUT);
   pinMode(MAX_TILT_REACHED, OUTPUT);
-  Serial.begin(9600);
+  // Serial.begin(9600);
 
   //resetBar();
 }
@@ -170,13 +184,7 @@ void loop()
     userInputLeft = 0;
   }
 
-  //pressing 'swap' button will toggle left and right controls
-  //  if (digitalRead(SWAP) == LOW && prevSwapReading == HIGH)
-  //  {
-  //    swapControls = !swapControls;
-  //  }
-
-  //pressing 'swap' button will toggle speed
+  //To test speed up: pressing 'swap' button will toggle speed
   //from slow (5rpm), med (10rpm), fast (15rpm), then back to slow
 //  if (digitalRead(SWAP) == LOW && prevSwapReading == HIGH)
 //  {
@@ -190,14 +198,26 @@ void loop()
 //  }
 
   //for testing resetBar()
-  if (digitalRead(SWAP) == LOW && prevSwapReading == HIGH)
-    {
-      resetBar();
-    }
+  // if (digitalRead(SWAP) == LOW && prevSwapReading == HIGH)
+  //   {
+  //     resetBar();
+  //   }
 
-  prevSwapReading = digitalRead(SWAP);
 
-  moveBar();
+  
+  // TODO replace with real power down code
+    //pressing 'swap' button will toggle left and right controls
+   if (digitalRead(SWAP) == LOW && prevSwapReading == HIGH)
+   {
+     swapControls = !swapControls;
+   }
+      prevSwapReading = digitalRead(SWAP);
+      
+  if (swapControls) {
+    moveBarSwapped();
+  } else {
+    moveBar();
+  }
 }
 
 void setBarSpeed() {
@@ -213,8 +233,6 @@ void setBarSpeed() {
 
 void moveBar()
 {
-  setBarSpeed();
-
     if (userInputRight > 0 && barPosR > CEILING && barTilt < MAX_BAR_TILT)
     { //move right side of bar UP
       motorR.step(STEP_INCR);
@@ -232,6 +250,70 @@ void moveBar()
       barPosL-= 1;
     }
     else if (userInputLeft < 0 && barPosL < FLOOR && barTilt < MAX_BAR_TILT)
+    { //move left side of bar DOWN
+      motorL.step(-STEP_INCR);
+      barPosL+= 1;
+    }
+
+  barTilt = barPosL - barPosR;
+
+  //turn on LEDs for debugging
+  if (abs(barTilt) == MAX_BAR_TILT)
+  {
+    digitalWrite(MAX_TILT_REACHED, HIGH);
+  }
+  else
+  {
+    digitalWrite(MAX_TILT_REACHED, LOW);
+  }
+
+  switch (barPosL)
+  {
+  case FLOOR:
+    digitalWrite(L_FLOOR, HIGH);
+    break;
+  case CEILING:
+    digitalWrite(L_CEIL, HIGH);
+    break;
+  default:
+    digitalWrite(L_FLOOR, LOW);
+    digitalWrite(L_CEIL, LOW);
+  }
+
+  switch (barPosR)
+  {
+  case FLOOR:
+    digitalWrite(R_FLOOR, HIGH);
+    break;
+  case CEILING:
+    digitalWrite(R_CEIL, HIGH);
+    break;
+  default:
+    digitalWrite(R_FLOOR, LOW);
+    digitalWrite(R_CEIL, LOW);
+  }
+}
+
+void moveBarSwapped()
+{
+  // setBarSpeed(); // TODO set this when the level increases
+    if (userInputLeft > 0 && barPosR > CEILING && barTilt < MAX_BAR_TILT)
+    { //move right side of bar UP
+      motorR.step(STEP_INCR);
+      barPosR-= 1;
+    }
+    else if (userInputLeft < 0 && barPosR < FLOOR && barTilt > -MAX_BAR_TILT)
+    { //move right side of bar DOWN
+      motorR.step(-STEP_INCR);
+      barPosR+= 1;
+    }
+
+    if (userInputRight > 0 && barPosL > CEILING && barTilt > -MAX_BAR_TILT)
+    { //move left side of bar UP
+      motorL.step(STEP_INCR);
+      barPosL-= 1;
+    }
+    else if (userInputRight < 0 && barPosL < FLOOR && barTilt < MAX_BAR_TILT)
     { //move left side of bar DOWN
       motorL.step(-STEP_INCR);
       barPosL+= 1;
