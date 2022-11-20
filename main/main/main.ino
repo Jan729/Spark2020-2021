@@ -182,18 +182,8 @@ void updateTarget() {
 void resetBall() {
   //wait until ball is ready to roll onto the bar
   //put the ball back onto the bar
-  
-    const int speed=100; //arbitrary, to be adjusted with testing
-    const int stepsPerRevolution=800; //not used but for reference
-    int stepsFor30Degrees=67; //800*(30/360) rounded as int
-
-    Stepper myStepper(stepsPerRevolution,RESET_MOTOR_STEP,RESET_MOTOR_DIR); //need to make sure pins are consistent with pin declarations in main***
-    
-    myStepper.setSpeed(speed); //setSpeed only take a positive number
     myStepper.step(stepsFor30Degrees); //rotate 30 degrees
-
     delay(1000);
-  
     myStepper.step(stepsFor30Degrees*-1); //rotate in opposite direction
   
   Serial.println("reset ball");
@@ -726,6 +716,12 @@ void setup() {
  Wire.write(0x00); // set all of port B to outputs
  Wire.endTransmission();
   
+const int speed=100; //arbitrary, to be adjusted with testing
+const int stepsPerRevolution=800; //not used but for reference
+int stepsFor30Degrees=67; //800*(30/360) rounded as int
+Stepper myStepper(stepsPerRevolution,RESET_MOTOR_STEP,RESET_MOTOR_DIR); //need to make sure pins are consistent with pin declarations in main***
+myStepper.setSpeed(speed); //setSpeed only take a positive number
+	
   resetBar();
 }
 
