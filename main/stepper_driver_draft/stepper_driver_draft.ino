@@ -49,17 +49,23 @@
 #include <Stepper.h>
 //#include <MultiStepper.h>
 
-//EXPERIMENTAL VALUES - will need to adjust as we prototype
+// Feb 5, 2023: measurements from real Remy's backboard
+// 30.5" from ball return to last hole = 775mm
+// 7" = 178mm from ball return to start of playing area. not sure where visible area is
+// 2mm/rev
+// 178mm / 2 = 89 revs from ball return to start
+// 388 revs from ball return to last hole
+// Guess: 76mm = 38 rev max height difference between L and R ends of bar
 
 #define CEILING 0                //highest height of bar
-#define FLOOR 8888             //bottom of the playing area, not actually the floor
-#define BALL_RETURN_HEIGHT 99999 //lowest height of bar, where bar will pick up ball
-#define MAX_BAR_TILT 6400         //maximum vertical slope of bar, aka barPosRight - barPosLeft
-#define MAX_SPEED 200 //note 10 is the fastest for 28byj
-#define STEP_INCR 50 //steps taken on each loop() iteration
-#define STEPS_PER_REV 800 //DRV //use 2048 for 28byj stepper with ULN2003
+#define FLOOR 299             //bottom of the playing area, not actually the floor
+#define BALL_RETURN_HEIGHT 388 //lowest height of bar, where bar will pick up ball
+#define MAX_BAR_TILT 38         //maximum vertical slope of bar, aka barPosRight - barPosLeft
+#define MAX_SPEED 200 
+#define STEP_INCR 800 //steps taken on each loop() iteration
+#define STEPS_PER_REV 800 //DRV driver
 #define SPEED_MULT 5           //multiply user input value with this number to set desired stepper speed
-#define BALL_RETURN_DELAY 2000 //time to wait until a new ball has rolled onto bar
+#define BALL_RETURN_DELAY 2000 //time in ms to wait until a new ball has rolled onto bar
 //distance sensors code will give the motors a number within the range [-3, 3]
 //-ve speed means "down", +ve speed means "up"
 #define STOP 0
@@ -77,19 +83,7 @@ int barTilt = 0;
 
 int speedBoost = 1; //increment this number to increase the bar speed
 
-////only for 28byj stepper with ULN2003 driver
-// #define RT_COIL_1A 4 
-// #define RT_COIL_1B 5
-// #define RT_COIL_2A 6
-// #define RT_COIL_2B 7
-// #define LT_COIL_1A 10
-// #define LT_COIL_1B 11
-// #define LT_COIL_2A 12
-// #define LT_COIL_2B 13
-// Stepper motorR = Stepper(STEPS_PER_REV, RT_COIL_1A, RT_COIL_1B, RT_COIL_2A, RT_COIL_2B);
-// Stepper motorL = Stepper(STEPS_PER_REV, LT_COIL_1A, LT_COIL_1B, LT_COIL_2A, LT_COIL_2B);
-
-// TODO change to DRV drivers
+// To setup DRV drivers
 // DIR pin is in the opposite corner and on the same long edge as the pot
 // STP is right next to DIR
 // pull RST and SLP to 5V to activate driver
@@ -162,14 +156,14 @@ void setup()
 void loop()
 {
   //PROTYPING ONLY - get user input from pushbuttons
-  if (digitalRead(R_UP) == HIGH)
+  if (digitalRead(R_UP) == LOW)
   {
     userInputRight = 1;
   }
 
   // TODO replace all variables with joystick values
   // digitalRead(JoystickDownPin) == LOW)
-  else if (digitalRead(R_DOWN  == HIGH))
+  else if (digitalRead(R_DOWN  == LOW))
   {
     userInputRight = -1;
     
@@ -179,11 +173,11 @@ void loop()
     userInputRight = 0;
   }
 
-  if (digitalRead(L_UP) == HIGH)
+  if (digitalRead(L_UP) == LOW)
   {
     userInputLeft = 1;
   }
-  else if (digitalRead(L_DOWN) == HIGH)
+  else if (digitalRead(L_DOWN) == LOW)
   {
     userInputLeft = -1;
   }
@@ -191,25 +185,6 @@ void loop()
   {
     userInputLeft = 0;
   }
-
-  //To test speed up: pressing 'swap' button will toggle speed
-  //from slow (5rpm), med (10rpm), fast (15rpm), then back to slow
-//  if (digitalRead(SWAP) == LOW && prevSwapReading == HIGH)
-//  {
-//    userSpeed+= 1;
-//    if (userSpeed > 3)
-//    {
-//      userSpeed = 1;
-//    }
-//    motorR.setSpeed(userSpeed * SPEED_MULT + speedBoost); //TODO: if swapControls, swap left and right speed
-//    motorL.setSpeed(userSpeed * SPEED_MULT + speedBoost); //only set the speed if user input changes
-//  }
-
-  //for testing resetBar()
-  // if (digitalRead(SWAP) == LOW && prevSwapReading == HIGH)
-  //   {
-  //     resetBar();
-  //   }
 
   // TO REMEMBER: no need for swap. user input variables will swap it for us
     moveBar();
@@ -276,70 +251,7 @@ void moveBar()
     digitalWrite(L_CEIL, LOW);
   }
 
-  switch (barPosR)
-  {
-  case FLOOR:
-    digitalWrite(R_FLOOR, HIGH);
-    break;
-  case CEILING:
-    digitalWrite(R_CEIL, HIGH);
-    break;
-  default:
-    digitalWrite(R_FLOOR, LOW);
-    digitalWrite(R_CEIL, LOW);
-  }
-}
-
-void moveBarSwapped()
-{
-  // setBarSpeed(); // TODO set this when the level increases
-    if (userInputLeft > 0 && barPosR > CEILING && barTilt < MAX_BAR_TILT)
-    { //move right side of bar UP
-      motorR.step(STEP_INCR);
-      barPosR-= 1;
-    }
-    else if (userInputLeft < 0 && barPosR < FLOOR && barTilt > -MAX_BAR_TILT)
-    { //move right side of bar DOWN
-      motorR.step(-STEP_INCR);
-      barPosR+= 1;
-    }
-
-    if (userInputRight > 0 && barPosL > CEILING && barTilt > -MAX_BAR_TILT)
-    { //move left side of bar UP
-      motorL.step(STEP_INCR);
-      barPosL-= 1;
-    }
-    else if (userInputRight < 0 && barPosL < FLOOR && barTilt < MAX_BAR_TILT)
-    { //move left side of bar DOWN
-      motorL.step(-STEP_INCR);
-      barPosL+= 1;
-    }
-
-  barTilt = barPosL - barPosR;
-
-  //turn on LEDs for debugging
-  if (abs(barTilt) == MAX_BAR_TILT)
-  {
-    digitalWrite(MAX_TILT_REACHED, HIGH);
-  }
-  else
-  {
-    digitalWrite(MAX_TILT_REACHED, LOW);
-  }
-
-  switch (barPosL)
-  {
-  case FLOOR:
-    digitalWrite(L_FLOOR, HIGH);
-    break;
-  case CEILING:
-    digitalWrite(L_CEIL, HIGH);
-    break;
-  default:
-    digitalWrite(L_FLOOR, LOW);
-    digitalWrite(L_CEIL, LOW);
-  }
-
+ // LEDs for debugging
   switch (barPosR)
   {
   case FLOOR:
@@ -376,21 +288,21 @@ void resetBar()
   
   while (barPosL < BALL_RETURN_HEIGHT)
   {
+
 //TODO: when bar sensor triggered, reset barPos to FLOOR
-//depends on how mech mounts the bar sensor
+// if we notice the software motor position values drift over time, add a sensor to re-calibrate
 // in variable declarations, add this line: #define BAR_SENSOR_PIN (insert pin number here)
 //   if(digitalRead(BAR_SENSOR_PIN) == HIGH) {
 //      barPosL = FLOOR;
 //      barPosR = FLOOR;
 //   }
-
    motorL.step(STEP_INCR);
    motorR.step(STEP_INCR); 
    barPosL+= 1;
    barPosR+= 1;
   }
 
-  //resetBall(); //matt has the code for this function?
+  //resetBall(); //matt has the code for this function
 
   //lift bar to start of playing area
   while (barPosL > FLOOR)
