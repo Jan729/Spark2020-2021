@@ -9,12 +9,15 @@
 #define SCOREINCREASE 10
 #define NUMTARGETS 35
 #define IROFFSET 25
+#define STARTBUTTONPIN 2 //TODO: add circuit usually ON button (HIGH)
 #include <Stepper.h>
 #include "RunningAverage.h"
 #include "SevSeg.h"
 #include "Wire.h"
 #include <Wire.h>
 #include "Adafruit_MCP23017.h"
+#include <avr/interrupt.h>
+
 //these can be changed and we need 
 //two for each IR sensor
 
@@ -93,6 +96,8 @@ int right_button = 8;
 //global variables for timing 
 unsigned long finishTime;  //time when the ball drops into target hole, resets each round
 unsigned long idleTime;
+volatile long debounce_time = 0;
+volatile long current_button_time = 0
 
 int targetHoles[NUMTARGETS]; //sequential pin numbers of target holes, eg 0, 1, 2, 3...
 
@@ -209,6 +214,22 @@ void checkIdleTime(){
 }
 
 /****** USER INPUT FUNCTIONS ****/
+//ISR for start button
+void buttonPressed() {
+  if(playingGame == true){
+    current_button_time = millis();
+    if (current_button_time - debounce_time > 200) {
+      Serial.println("start button pressed");
+      playingGame = !playingGame; // change state of game
+      resetGame(); //TODO: make sure it's functioning well to reset starting parameters
+    }
+    if (playingGame == false) {
+      waitToStartGame();
+    }
+  }
+  debounce_time = current_button_time; //to make sure we're not reading the button press multiple times
+}
+
 void get_left_user_input() {
 	userSpeedLeft = digitalRead(left_button);
 
@@ -652,6 +673,10 @@ void setup() {
     digitalWrite(i, HIGH); // turn on the pullup
     targetHoles[i] = i;
   }
+
+  //button interrupt
+  pinMode(STARTBUTTONPIN, INPUT_PULLUP)  //Start button, LOW when pressed
+  attachInterrupt(digitalPinToInterrupt(STARTBUTTONPIN), buttonPressed, FALLING);
 
   // Game Input Buttons to Move Bar 
   pinMode(left_button, INPUT);
