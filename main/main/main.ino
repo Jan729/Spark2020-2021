@@ -21,7 +21,7 @@
 //these can be changed and we need 
 //two for each IR sensor
 
-//START OF PIN DECLARATIONS
+/************START OF CONSTANTS*********************/
 int IRSensor = 2; // connect ir sensor to arduino pin 2
 int LED = 13; // connect Led to arduino pin 13
 
@@ -32,31 +32,18 @@ int LED = 13; // connect Led to arduino pin 13
 #define MOTOR_L_DIR  17
 #define RESET_MOTOR_STEP 0
 #define RESET_MOTOR_DIR 1
-Stepper motorR = Stepper(MOTOR_R_STEP, MOTOR_R_DIR);
-Stepper motorL = Stepper(MOTOR_L_STEP, MOTOR_L_DIR);
+#define STEPS_PER_REV 800 //DRV driver
+#define CEILING 0                //highest height of bar
+#define FLOOR 299             //bottom of the playing area, not actually the floor
+#define BALL_RETURN_HEIGHT 388 //lowest height of bar, where bar will pick up ball
+#define MAX_BAR_TILT 38         //maximum vertical slope of bar, aka barPosRight - barPosLeft
+#define MAX_SPEED 200 //in rpm
+#define STEP_INCR 800 //steps taken on each loop() iteration
+#define BALL_RETURN_DELAY 2000 //time to wait until a new ball has rolled onto bar
 
 //gpio pins. MUST USE SPECIAL PINS 20 and 21
 #define SERIAL_DATA_LINE 20
 #define SERIAL_CLOCK_LINE 21
-
-//END OF PIN DECLARATIONS
-
-//experimental stepper positions for bar movement
-#define CEILING 0                //highest height of bar
-#define FLOOR 10000             //bottom of the playing area, not actually the floor
-#define BALL_RETURN_HEIGHT 11000 //lowest height of bar, where bar will pick up ball
-#define MAX_BAR_TILT 200         //maximum vertical slope of bar, aka barPosRight - barPosLeft
-#define MAX_SPEED 10 //in rpm
-#define STEP_INCR 1 //steps taken on each loop() iteration
-#define SPEED_MULT 5           //multiply user input value with this number to set desired stepper speed
-#define BALL_RETURN_DELAY 2000 //time to wait until a new ball has rolled onto bar
-
-//distance sensors code will give the motors a number within the range [-3, 3]
-//-ve speed means "down", +ve speed means "up"
-#define STOP 0
-#define SLOW 1
-#define MED 2
-#define FAST 3
 
 /************END OF CONSTANTS*********************/
 
@@ -102,15 +89,13 @@ volatile long current_button_time = 0
 int targetHoles[NUMTARGETS]; //sequential pin numbers of target holes, eg 0, 1, 2, 3...
 
 //global vars for bar movement
-int userSpeedLeft = 0; //from get_left_user_input()
-int userSpeedRight = 0;
-int prevSpeedLeft = 0;
-int prevSpeedRight = 0;
+int moveLeftBarUp = 0;
+int moveRightBarUp = 0;
 int barPosL = FLOOR;
 int barPosR = FLOOR;
 int barTilt = 0;
-
-int speedBoost = 1; //TODO: increment this number to increase the bar speed
+Stepper motorR = Stepper(STEPS_PER_REV, MOTOR_R_STEP, MOTOR_R_DIR);
+Stepper motorL = Stepper(STEPS_PER_REV, MOTOR_L_STEP, MOTOR_L_DIR);
 
 SevSeg sevseg1;
 SevSeg sevseg2;
@@ -131,16 +116,12 @@ int smooth_distance (int num_samples);
 int sample_distance();
 bool beamBroken(int target);
 void ballEntry();
-void setBarSpeed();
 void moveBar();
 void resetBar();
 void updateLights(int lastHole, int newHole);
 void updateScore();
 void displayScore();
 void sethighScore();
-void powerdown_handler();
-void power_down_reverse_control (bool opposite);
-void power_down_change_speed();
 void flashAllTargetLEDs();
 void displayWinMessage();
 void displayLoseMessage();
@@ -231,12 +212,10 @@ void buttonPressed() {
 }
 
 void get_left_user_input() {
-	userSpeedLeft = digitalRead(left_button);
-
+	moveLeftBarUp = !digitalRead(left_button); // active low
 }
 void get_right_user_input() {
-	userSpeedRight = digitalRead(right_button);
-
+	moveRightBarUp = !digitalRead(right_button); // active low
 }
 
 /****** END OF USER INPUT FUNCTIONS ****/
@@ -316,46 +295,20 @@ void ballEntry() {
 
 /*********** START OF BAR MOVEMENT FUNCTIONS *********/
 
-//helper fxn for moveBar()
-//changes the motor speed if user input speed changes
-void setBarSpeed() { 
-  if(userSpeedLeft != prevSpeedLeft) {
-      motorL.setSpeed(userSpeedLeft * SPEED_MULT + speedBoost);
-    }
-  if(userSpeedRight != prevSpeedRight) {
-      motorR.setSpeed(userSpeedRight * SPEED_MULT + speedBoost);
-    }
-  prevSpeedLeft = userSpeedLeft;
-  prevSpeedRight = userSpeedRight;
-  userSpeedLeft = userSpeedLeft * SPEED_MULT + speedBoost;
-  userSpeedRight = userSpeedRight * SPEED_MULT + speedBoost;
-}
-
 //will move right motor and left motor 1 step each time moveBar() is called
 void moveBar()
 {
-  setBarSpeed();
-
-    if (userSpeedRight > 0 && barPosR > CEILING && barTilt < MAX_BAR_TILT)
+  // TODO: the bar will only move up for now. add down controls if the game is too hard
+    if (moveRightBarUp && barPosR > CEILING && barTilt < MAX_BAR_TILT)
     { //move right side of bar UP
       motorR.step(STEP_INCR);
       barPosR-= 1;
     }
-    else if (userSpeedRight < 0 && barPosR < FLOOR && barTilt > -MAX_BAR_TILT)
-    { //move right side of bar DOWN
-      motorR.step(-STEP_INCR);
-      barPosR+= 1;
-    }
 
-    if (userSpeedLeft > 0 && barPosL > CEILING && barTilt > -MAX_BAR_TILT)
+    if (moveLeftBarUp && barPosL > CEILING && barTilt > -MAX_BAR_TILT)
     { //move left side of bar UP
       motorL.step(STEP_INCR);
       barPosL-= 1;
-    }
-    else if (userSpeedLeft < 0 && barPosL < FLOOR && barTilt < MAX_BAR_TILT)
-    { //move left side of bar DOWN
-      motorL.step(-STEP_INCR);
-      barPosL+= 1;
     }
 
   barTilt = barPosL - barPosR;
@@ -593,47 +546,6 @@ void displayLoseMessage() {
 
 /************ END OF OUTPUT FUNCTIONS ***********/
 
-/************ START OF POWER DOWN FUNCTIONS ***********/
-void powerdown_handler(){
-  if(level <=7){
-    power_down_reverse_control(false);
-  }else{
-    int powerdown = (int)random(0,2);
-    
-    switch(powerdown){
-      case 0:
-        power_down_reverse_control(true);
-        break;
-      case 1:
-        power_down_reverse_control(false);
-        power_down_change_speed();
-        break;
-      case 2:
-        power_down_reverse_control(true);
-        power_down_change_speed(true);
-        break;
-      default:
-        power_down_reverse_control(false);
-        break;
-    }
-  }
-}
-
-void power_down_reverse_control () {
-  int temp_left = left_button;
-  left_button = right_button;
-  right_button = temp_left;
-}
-
-
-void power_down_change_speed() { 
-  int increase  = (int)random(1, 3);
-  speedBoost = speedBoost + increase; 
-}
-
-
-/************ END OF POWER DOWN  FUNCTIONS ***********/
-
 /**********END OF HELPER FUNCTION IMPLEMENTATIONS******/
 
 void setup() {
@@ -741,13 +653,16 @@ void setup() {
  Wire.write(0x00); // set all of port B to outputs
  Wire.endTransmission();
   
+// ball return stepper motor
 const int speed=100; //arbitrary, to be adjusted with testing
 const int stepsPerRevolution=800; //not used but for reference
 int stepsFor30Degrees=67; //800*(30/360) rounded as int
 Stepper myStepper(stepsPerRevolution,RESET_MOTOR_STEP,RESET_MOTOR_DIR); //need to make sure pins are consistent with pin declarations in main***
 myStepper.setSpeed(speed); //setSpeed only take a positive number
-	
-  resetBar();
+
+motorR.setSpeed(MAX_SPEED)
+motorL.setSpeed(MAX_SPEED)
+resetBar();
 }
 
 void loop() {

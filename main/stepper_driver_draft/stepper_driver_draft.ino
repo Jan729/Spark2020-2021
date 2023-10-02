@@ -4,7 +4,7 @@
   
   IMPORTANT: If you don't have a driver connected to your arduino and directly plugged the stepper into
             your arduino instead, uncomment the code labeled "without driver" and 
-            comment out the code labeled "with driver"mo
+            comment out the code labeled "with driver"
 
   
   Assumptions:
