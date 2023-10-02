@@ -7,7 +7,7 @@
 #define SENSORPIN 0
 #define BOTTOMPIN 13
 #define SCOREINCREASE 10
-#define NUMTARGETS 35
+#define NUMTARGETS 30
 #define IROFFSET 25
 #define STARTBUTTONPIN 2 //TODO: add circuit usually ON button (HIGH)
 #include <Stepper.h>
@@ -62,7 +62,7 @@ long duration;
 // distance between sensor and object
 int distance;
 
-RunningAverage holes[35];
+RunningAverage holes[(int)NUMTARGETS];
 
 bool playingGame = true; //true if someone is playing, false if game over
 bool winGame = false; 
@@ -86,7 +86,7 @@ unsigned long idleTime;
 volatile long debounce_time = 0;
 volatile long current_button_time = 0
 
-int targetHoles[NUMTARGETS]; //sequential pin numbers of target holes, eg 0, 1, 2, 3...
+int targetHoles[NUMTARGETS];
 
 //global vars for bar movement
 int moveLeftBarUp = 0;
