@@ -101,9 +101,6 @@ SevSeg sevseg1;
 SevSeg sevseg2;
 SevSeg sevseg3;
 
-//global variables for power downs
-bool sped_up = false;
-
 /************END OF GLOBAL VARIABLES**********************/
 
 /**********HELPER FUNCTION PROTOTYPES******************/
@@ -112,8 +109,6 @@ void updateTarget();
 void resetBall();
 void resetGame();
 void checkIdleTime();
-int smooth_distance (int num_samples);
-int sample_distance();
 bool beamBroken(int target);
 void ballEntry();
 void moveBar();
@@ -295,7 +290,6 @@ void ballEntry() {
 
 /*********** START OF BAR MOVEMENT FUNCTIONS *********/
 
-//will move right motor and left motor 1 step each time moveBar() is called
 void moveBar()
 {
   // TODO: the bar will only move up for now. add down controls if the game is too hard
@@ -449,8 +443,6 @@ void sethighScore() {
 }
 
 void flashAllTargetLEDs() {
-    //TODO Matt: index target LEDs from top to bottom
-    // and uncomment this loop
     for(int i = 15; i <=0 ; i--) {
      mcp3.digitalWrite(i, HIGH);
      delay(100);
@@ -670,12 +662,6 @@ void loop() {
   waitToStartGame(); //wait for user to start game and set PlayingGame = true
 
   while (playingGame) {
-    //user input: just for testing purposes
-    //distance = smooth_distance(20);
-    //Serial.print("Distance: ");
-    //Serial.println(distance);
-
-    
     //TODO: Work out where to call start and end times (NOT DONE)
     finishTime = millis(); //might not need here depending on when updateTarget is called. 
   
