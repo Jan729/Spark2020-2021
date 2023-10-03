@@ -45,9 +45,23 @@ int LED = 13; // connect Led to arduino pin 13
 #define SERIAL_DATA_LINE 20
 #define SERIAL_CLOCK_LINE 21
 
+/*
+Pin count
+MOTORS – 6 digital driver pins (step and dir x3 drivers, right bar, left bar, ball return)
+IR SENSORS – 1 analog, 6 digital (for muxes)
+LED + SHIFT REGISTOR – 3 digital
+Reset/Start button - 1 digital interrupt pin
+Left joystick - 2 digital pins (up and down)
+Right joystick - 2 digital pins (up and down)
+Hex displays () - 4 digital pins total, 2 per 4 digits, CLK and DIO
+(reference: https://www.instructables.com/How-to-Use-the-TM1637-Digit-Display-With-Arduino/)
+
+*/
+
 /************END OF CONSTANTS*********************/
 
 /************GLOBAL VARIABLES**********************/
+// spark PCB
 Adafruit_MCP23017 mcp1; //shift registers; 8 of them, each with 16 pins
 Adafruit_MCP23017 mcp2;
 Adafruit_MCP23017 mcp3;
@@ -57,12 +71,8 @@ Adafruit_MCP23017 mcp6;
 Adafruit_MCP23017 mcp7;
 Adafruit_MCP23017 mcp8;
 
-// time for sound wave to travel to object and bounce back
-long duration;
-// distance between sensor and object
-int distance;
-
-RunningAverage holes[(int)NUMTARGETS];
+RunningAverage holes[(int)NUMTARGETS]; // stores IR sensor data
+int targetHoles[NUMTARGETS]; // stores pin numbers of target LEDs to light up
 
 bool playingGame = true; //true if someone is playing, false if game over
 bool winGame = false; 
@@ -85,8 +95,6 @@ unsigned long finishTime;  //time when the ball drops into target hole, resets e
 unsigned long idleTime;
 volatile long debounce_time = 0;
 volatile long current_button_time = 0
-
-int targetHoles[NUMTARGETS];
 
 //global vars for bar movement
 int moveLeftBarUp = 0;
