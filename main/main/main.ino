@@ -10,6 +10,39 @@
 #define NUMTARGETS 30
 #define IROFFSET 25
 #define STARTBUTTONPIN 2 //TODO: add circuit usually ON button (HIGH)
+#define JOYSTICK_R_UP 3
+#define JOYSTICK_R_DOWN 4
+#define JOYSTICK_L_UP 5
+#define JOYSTICK_L_DOWN 6
+
+#define MOTOR_R_STEP 7
+#define MOTOR_R_DIR  8
+#define MOTOR_L_STEP 9
+#define MOTOR_L_DIR  10
+#define RESET_MOTOR_STEP 11
+#define RESET_MOTOR_DIR 12
+
+// fixme give these a better name
+#define SPARK_PCB_1 24
+#define SPARK_PCB_2 26
+#define SPARK_PCB_3 28
+
+#define BAR_SENSOR_PIN 30 // todo: add sensor to calibrate bar position when display powered on
+#define HEX_PLAYER_CLK 32
+#define HEX_PLAYER_DIO 34
+#define HEX_HIGHSCORE_CLK 36
+#define HEX_HIGHSCORE_DIO 38
+
+// place the mux pins along the same row on the mega, next to the analog pins
+// fixme give these a better name
+#define MUX_DATA A15
+#define MUX_SELECT_1 46
+#define MUX_SELECT_2 48
+#define MUX_SELECT_3 50
+#define MUX_SELECT_A 47
+#define MUX_SELECT_B 49
+#define MUX_SELECT_C 51
+
 #include <Stepper.h>
 #include "RunningAverage.h"
 #include "SevSeg.h"
@@ -25,13 +58,6 @@
 int IRSensor = 2; // connect ir sensor to arduino pin 2
 int LED = 13; // connect Led to arduino pin 13
 
-#define BAR_SENSOR_PIN 12
-#define MOTOR_R_STEP 14
-#define MOTOR_R_DIR  15
-#define MOTOR_L_STEP 16
-#define MOTOR_L_DIR  17
-#define RESET_MOTOR_STEP 0
-#define RESET_MOTOR_DIR 1
 #define STEPS_PER_REV 800 //DRV driver
 #define CEILING 0                //highest height of bar
 #define FLOOR 299             //bottom of the playing area, not actually the floor
@@ -62,6 +88,7 @@ Hex displays () - 4 digital pins total, 2 per 4 digits, CLK and DIO
 
 /************GLOBAL VARIABLES**********************/
 // spark PCB
+// todo: change these to the correct chip: SN74HC595N
 Adafruit_MCP23017 mcp1; //shift registers; 8 of them, each with 16 pins
 Adafruit_MCP23017 mcp2;
 Adafruit_MCP23017 mcp3;
@@ -104,6 +131,8 @@ int barPosR = FLOOR;
 int barTilt = 0;
 Stepper motorR = Stepper(STEPS_PER_REV, MOTOR_R_STEP, MOTOR_R_DIR);
 Stepper motorL = Stepper(STEPS_PER_REV, MOTOR_L_STEP, MOTOR_L_DIR);
+int stepsPerRevolution = 800;
+Stepper myStepper(stepsPerRevolution,RESET_MOTOR_STEP,RESET_MOTOR_DIR); 
 
 SevSeg sevseg1;
 SevSeg sevseg2;
@@ -654,12 +683,9 @@ void setup() {
  Wire.endTransmission();
   
 // ball return stepper motor
-const int speed=100; //arbitrary, to be adjusted with testing
 const int stepsPerRevolution=800; //not used but for reference
 int stepsFor30Degrees=67; //800*(30/360) rounded as int
-Stepper myStepper(stepsPerRevolution,RESET_MOTOR_STEP,RESET_MOTOR_DIR); //need to make sure pins are consistent with pin declarations in main***
-myStepper.setSpeed(speed); //setSpeed only take a positive number
-
+myStepper.setSpeed(MAX_SPEED); //setSpeed only take a positive number
 motorR.setSpeed(MAX_SPEED)
 motorL.setSpeed(MAX_SPEED)
 resetBar();
