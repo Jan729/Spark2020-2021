@@ -4,8 +4,8 @@
 */
 
 /**********CONSTANTS*****************************/
-#define SENSORPIN 0
-#define BOTTOMPIN 13
+#define BOTTOMPIN 44 // FIXME this pin is for the sensor at the bottom of the backboard ramp
+                     // add this IR sensor to the mux circuit
 #define SCOREINCREASE 10
 #define NUMTARGETS 30
 #define IROFFSET 25
@@ -55,7 +55,6 @@
 //two for each IR sensor
 
 /************START OF CONSTANTS*********************/
-int IRSensor = 2; // connect ir sensor to arduino pin 2
 int LED = 13; // connect Led to arduino pin 13
 
 #define STEPS_PER_REV 800 //DRV driver
@@ -258,19 +257,16 @@ bool beamBroken(int target)
 {
 
   bool beamBroke = false;
-  //#define SENSORPIN 4
 
   // variables will change: // 1 = unbroked, 0 = broke 
   int sensorState;
-  
-  //sensorState = digitalRead(SENSORPIN);
-  
-  if(SENSORPIN < 16)
+    
+  if(targetSensorPin < 16)
   {
     sensorState = mcp1.digitalRead(targetSensorPin%16)
   }
   
-  else if(16 <= SENSORPIN < 32)
+  else if(16 <= targetSensorPin < 32)
   {
     sensorState = mcp2.digitalRead(targetSensorPin%16)
   }
@@ -287,12 +283,12 @@ bool beamBroken(int target)
   //pins starting at 0
   //so will probably need an offset (if pins start at 4 for example)
   
-  holes[SENSORPIN].addValue(!beamBroken*5);
+  holes[targetSensorPin].addValue(!beamBroken*5);
   //fiddle with the number 5 s.t. when beam is broken
   //it affects the average more
 
   //maybe change value from 1 to 0 or something else
-  if (holes[SENSORPIN].getAverage() > 1) {
+  if (holes[targetSensorPin].getAverage() > 1) {
     return 1;
   }
   return !beamBroken; //this way 1 = broken and 0 = unbroken
