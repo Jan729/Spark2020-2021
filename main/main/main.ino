@@ -9,7 +9,7 @@
 #define SCOREINCREASE 10
 #define NUMTARGETS 30
 #define IROFFSET 25
-#define STARTBUTTONPIN 2 //TODO: add circuit usually ON button (HIGH)
+#define STARTBUTTONPIN 2
 #define JOYSTICK_R_UP 3
 #define JOYSTICK_R_DOWN 4
 #define JOYSTICK_L_UP 5
@@ -100,7 +100,7 @@ Adafruit_MCP23017 mcp8;
 RunningAverage holes[(int)NUMTARGETS]; // stores IR sensor data
 int targetHoles[NUMTARGETS]; // stores pin numbers of target LEDs to light up
 
-bool playingGame = true; //true if someone is playing, false if game over
+volatile bool playingGame = true; //true if someone is playing, false if game over
 bool winGame = false; 
 bool loseGame = false;
 int score = 0;
@@ -226,20 +226,22 @@ void checkIdleTime(){
 }
 
 /****** USER INPUT FUNCTIONS ****/
-//ISR for start button
+//ISR for start/stop game button
 void buttonPressed() {
-  if(playingGame == true){
-    current_button_time = millis();
-    if (current_button_time - debounce_time > 200) {
-      Serial.println("start button pressed");
-      playingGame = !playingGame; // change state of game
-      resetGame(); //TODO: make sure it's functioning well to reset starting parameters
-    }
-    if (playingGame == false) {
-      waitToStartGame();
-    }
+  if (playingGame == true) {
+    Serial.println("button to end game is pressed");
+    //stop game, reset, and wait to start
+    playingGame = false;
+    resetGame();
+    // TO DO: wait to start in main loop, by reading playingGame value. have to redo main loop logic.
+    delayMicroseconds(100000); //non-blocking delay to debounce button
   }
-  debounce_time = current_button_time; //to make sure we're not reading the button press multiple times
+  else if(playingGame == false) {
+    Serial.println("button to start game is pressed");
+    //start game
+    playingGame = true;
+    delayMicroseconds(100000); //non-blocking delay to debounce button
+  }
 }
 
 void get_left_user_input() {
