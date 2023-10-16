@@ -51,10 +51,6 @@
 #include "Adafruit_MCP23017.h"
 #include <avr/interrupt.h>
 
-//these can be changed and we need 
-//two for each IR sensor
-
-/************START OF CONSTANTS*********************/
 int LED = 13; // connect Led to arduino pin 13
 
 #define STEPS_PER_REV 800 //DRV driver
@@ -65,10 +61,6 @@ int LED = 13; // connect Led to arduino pin 13
 #define MAX_SPEED 200 //in rpm
 #define STEP_INCR 800 //steps taken on each loop() iteration
 #define BALL_RETURN_DELAY 2000 //time to wait until a new ball has rolled onto bar
-
-//gpio pins. MUST USE SPECIAL PINS 20 and 21
-#define SERIAL_DATA_LINE 20
-#define SERIAL_CLOCK_LINE 21
 
 /*
 Pin count
