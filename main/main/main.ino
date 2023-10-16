@@ -1,7 +1,10 @@
-
-/* 
-  IR Breakbeam sensor demo!
-*/
+#include <Stepper.h>
+#include "RunningAverage.h"
+#include "SevSeg.h"
+#include "Wire.h"
+#include <Wire.h>
+#include <Adafruit_MCP23X17.h>
+#include <avr/interrupt.h>
 
 /**********CONSTANTS*****************************/
 #define BOTTOMPIN 44 // FIXME this pin is for the sensor at the bottom of the backboard ramp
@@ -43,14 +46,6 @@
 #define MUX_SELECT_B 49
 #define MUX_SELECT_C 51
 
-#include <Stepper.h>
-#include "RunningAverage.h"
-#include "SevSeg.h"
-#include "Wire.h"
-#include <Wire.h>
-#include "Adafruit_MCP23017.h"
-#include <avr/interrupt.h>
-
 int LED = 13; // connect Led to arduino pin 13
 
 #define STEPS_PER_REV 800 //DRV driver
@@ -60,7 +55,14 @@ int LED = 13; // connect Led to arduino pin 13
 #define MAX_BAR_TILT 38         //maximum vertical slope of bar, aka barPosRight - barPosLeft
 #define MAX_SPEED 200 //in rpm
 #define STEP_INCR 800 //steps taken on each loop() iteration
-#define BALL_RETURN_DELAY 2000 //time to wait until a new ball has rolled onto bar
+#define STEPS_30_DEG 67
+#define BALL_RETURN_DELAY_MS 2000 //time to wait until a new ball has rolled onto bar
+
+// FOR WOKWI TESTING ONLY:
+#define LOSE_GAME_BUTTON 14
+#define WIN_LEVEL_BUTTON 15
+
+#define NUM_IR_SAMPLES 10 // @ginny please adjust as you see fit
 
 /*
 Pin count
@@ -74,22 +76,21 @@ Hex displays () - 4 digital pins total, 2 per 4 digits, CLK and DIO
 (reference: https://www.instructables.com/How-to-Use-the-TM1637-Digit-Display-With-Arduino/)
 
 */
-
 /************END OF CONSTANTS*********************/
 
 /************GLOBAL VARIABLES**********************/
 // spark PCB
 // todo: change these to the correct chip: SN74HC595N
-Adafruit_MCP23017 mcp1; //shift registers; 8 of them, each with 16 pins
-Adafruit_MCP23017 mcp2;
-Adafruit_MCP23017 mcp3;
-Adafruit_MCP23017 mcp4;
-Adafruit_MCP23017 mcp5;
-Adafruit_MCP23017 mcp6;
-Adafruit_MCP23017 mcp7;
-Adafruit_MCP23017 mcp8;
+Adafruit_MCP23X17 mcp1; //shift registers; 8 of them, each with 16 pins
+Adafruit_MCP23X17 mcp2;
+Adafruit_MCP23X17 mcp3;
+Adafruit_MCP23X17 mcp4;
+Adafruit_MCP23X17 mcp5;
+Adafruit_MCP23X17 mcp6;
+Adafruit_MCP23X17 mcp7;
+Adafruit_MCP23X17 mcp8;
 
-RunningAverage holes[(int)NUMTARGETS]; // stores IR sensor data
+RunningAverage targetIRBuffer(NUM_IR_SAMPLES); // stores IR sensor data
 int targetHoles[NUMTARGETS]; // stores pin numbers of target LEDs to light up
 
 volatile bool playingGame = true; //true if someone is playing, false if game over
@@ -97,12 +98,14 @@ bool winGame = false;
 bool loseGame = false;
 int score = 0;
 int targetDifficulty = 0;
-int highscore = 0;
 int level = 0;
 int targetLEDPin = 0;
 int targetSensorPin = 0;
 bool targetBroken = false;
 bool bottomBroken = false;
+
+// hex display variables
+int highscore = 0;
 
 //global vars for pins for input buttons 
 int left_button = 7;
@@ -112,7 +115,7 @@ int right_button = 8;
 unsigned long finishTime;  //time when the ball drops into target hole, resets each round
 unsigned long idleTime;
 volatile long debounce_time = 0;
-volatile long current_button_time = 0
+volatile long current_button_time = 0;
 
 //global vars for bar movement
 int moveLeftBarUp = 0;
@@ -123,7 +126,7 @@ int barTilt = 0;
 Stepper motorR = Stepper(STEPS_PER_REV, MOTOR_R_STEP, MOTOR_R_DIR);
 Stepper motorL = Stepper(STEPS_PER_REV, MOTOR_L_STEP, MOTOR_L_DIR);
 int stepsPerRevolution = 800;
-Stepper myStepper(stepsPerRevolution,RESET_MOTOR_STEP,RESET_MOTOR_DIR); 
+Stepper motorBallReturn = Stepper(STEPS_PER_REV, RESET_MOTOR_STEP, RESET_MOTOR_DIR); 
 
 SevSeg sevseg1;
 SevSeg sevseg2;
@@ -158,7 +161,8 @@ void waitToStartGame() {
 
   //player places hand over one of the sensors to start
   //has to be high above sensor
-  if (start_game_input() == 1) {
+  int start_game_dummy_var = 1;
+  if (start_game_dummy_var == 1) {
     //start the game
     playingGame = true;
     resetGame();
@@ -188,12 +192,10 @@ void updateTarget() {
   updateLights(oldTarget, targetLEDPin);
 }
 
-void resetBall() {
-  //wait until ball is ready to roll onto the bar
-  //put the ball back onto the bar
-    myStepper.step(stepsFor30Degrees); //rotate 30 degrees
-    delay(1000);
-    myStepper.step(stepsFor30Degrees*-1); //rotate in opposite direction
+void resetBall() { // TODO check +ve and -ve direction
+    motorBallReturn.step(STEPS_30_DEG);
+    delay(BALL_RETURN_DELAY_MS);
+    motorBallReturn.step(-STEPS_30_DEG);
   
   Serial.println("reset ball");
 }
@@ -257,17 +259,17 @@ bool beamBroken(int target)
     
   if(targetSensorPin < 16)
   {
-    sensorState = mcp1.digitalRead(targetSensorPin%16)
+    sensorState = mcp1.digitalRead(targetSensorPin%16);
   }
   
   else if(16 <= targetSensorPin < 32)
   {
-    sensorState = mcp2.digitalRead(targetSensorPin%16)
+    sensorState = mcp2.digitalRead(targetSensorPin%16);
   }
   
   else
   {
-    sensorState = mcp3.digitalRead(targetSensorPin%16)
+    sensorState = mcp3.digitalRead(targetSensorPin%16);
   }
   
 
@@ -277,12 +279,12 @@ bool beamBroken(int target)
   //pins starting at 0
   //so will probably need an offset (if pins start at 4 for example)
   
-  holes[targetSensorPin].addValue(!beamBroken*5);
+  targetIRBuffer.addValue(!beamBroken*5);
   //fiddle with the number 5 s.t. when beam is broken
   //it affects the average more
 
   //maybe change value from 1 to 0 or something else
-  if (holes[targetSensorPin].getAverage() > 1) {
+  if (targetIRBuffer.getAverage() > 1) {
     return 1;
   }
   return !beamBroken; //this way 1 = broken and 0 = unbroken
@@ -387,8 +389,8 @@ void resetBar()
 
 /************ START OF OUTPUT FUNCTIONS ***********/
 void updateLights(int lastHole, int newHole){
-  digitalWrite(lastHole, LOW)
-  digitalWrite(newHole, HIGH)
+  digitalWrite(lastHole, LOW);
+  digitalWrite(newHole, HIGH);
 }
 
 //we can put this array somewhere else
@@ -440,33 +442,34 @@ void displayScore() {
   
   //update digits on the seven seg display 
 
+// TODO: update this code to work with our current parts
 
-  Wire.beginTransmission(0x20); //select chip 0x20
-  Wire.write(0x12); // Select Port A
-  Wire.write(gpio_num_array[thirdDigit]); // Send data
-  Wire.endTransmission();
-  Wire.beginTransmission(0x20); //select chip 0x20
-  Wire.write(0x13); // Select Port B
-  Wire.write(gpio_num_array[highFirst]); // Send data
-  Wire.endTransmission();
-  Wire.beginTransmission(0x27); //select chip 0x27
-  Wire.write(0x12); // Select Port A
-  Wire.write(gpio_num_array[highSecond]); // Send data
-  Wire.endTransmission();
-  Wire.beginTransmission(0x27); //select chip 0x27
-  Wire.write(0x13); // Select Port B
-  Wire.write(gpio_num_array[highThrid]); // Send data
-  Wire.endTransmission();
+  // Wire.beginTransmission(0x20); //select chip 0x20
+  // Wire.write(0x12); // Select Port A
+  // Wire.write(gpio_num_array[thirdDigit]); // Send data
+  // Wire.endTransmission();
+  // Wire.beginTransmission(0x20); //select chip 0x20
+  // Wire.write(0x13); // Select Port B
+  // Wire.write(gpio_num_array[highFirst]); // Send data
+  // Wire.endTransmission();
+  // Wire.beginTransmission(0x27); //select chip 0x27
+  // Wire.write(0x12); // Select Port A
+  // Wire.write(gpio_num_array[highSecond]); // Send data
+  // Wire.endTransmission();
+  // Wire.beginTransmission(0x27); //select chip 0x27
+  // Wire.write(0x13); // Select Port B
+  // Wire.write(gpio_num_array[highThird]); // Send data
+  // Wire.endTransmission();
 
 }
 
 void sethighScore() {
-  if (score > highscore) {
-    highscore = score;
-    int highFirst = high/100;
-    int highSecond = (highscore-highFirst)/10;
-    int highThird = (highscore-highFirst-highSecond);
-  }
+  // if (score > highscore) {
+  //   highscore = score;
+  //   int highFirst = high/100;
+  //   int highSecond = (highscore-highFirst)/10;
+  //   int highThird = (highscore-highFirst-highSecond);
+  // }
 }
 
 void flashAllTargetLEDs() {
@@ -534,35 +537,6 @@ void displayLoseMessage() {
   }
 }
 
-void displayLoseMessage() {
-  for (int i=1; i<=3; i++) {
-    sevseg1.setChars("o");
-    sevseg1.refreshDisplay(); 
-    sevseg2.setChars("h");
-    sevseg2.refreshDisplay(); 
-    sevseg3.blank();
-    sevseg3.refreshDisplay(); 
-    delay(500);
-    sevseg1.setChars("n");
-    sevseg1.refreshDisplay(); 
-    sevseg2.setChars("o");
-    sevseg2.refreshDisplay(); 
-    delay(500);
-    sevseg1.setChars("s");
-    sevseg1.refreshDisplay(); 
-    sevseg2.setChars("o");
-    sevseg2.refreshDisplay(); 
-    delay(500);
-    sevseg1.setChars("s");
-    sevseg1.refreshDisplay(); 
-    sevseg2.setChars("a");
-    sevseg2.refreshDisplay(); 
-    sevseg3.setNumber("d");
-    sevseg3.refreshDisplay(); 
-    delay(500);
-  }
-}
-
 /************ END OF OUTPUT FUNCTIONS ***********/
 
 /**********END OF HELPER FUNCTION IMPLEMENTATIONS******/
@@ -571,32 +545,24 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600); // Starts the serial communication
 
-  mcp1.begin(0);
-  mcp2.begin(1);
-  mcp3.begin(2);
-  mcp4.begin(3);
-  mcp5.begin(4);
-  mcp6.begin(5);
-  mcp7.begin(6);
-  mcp8.begin(7);
+  mcp1.begin_I2C(0);
+  mcp2.begin_I2C(1);
+  mcp3.begin_I2C(2);
+  mcp4.begin_I2C(3);
+  mcp5.begin_I2C(4);
+  mcp6.begin_I2C(5);
+  mcp7.begin_I2C(6);
+  mcp8.begin_I2C(7);
   
   for (int i=0; i<16; i++) {
-    mcp1.pinMode(i, INPUT);
-    mcp1.pullUp(i, HIGH);
-    mcp2.pinMode(i, INPUT);
-    mcp2.pullUp(i, HIGH);
-    mcp3.pinMode(i, INPUT);
-    mcp3.pullUp(i, HIGH);
-    mcp4.pinMode(i, INPUT);
-    mcp4.pullUp(i, HIGH);
-    mcp5.pinMode(i, INPUT);
-    mcp5.pullUp(i, HIGH);
-    mcp6.pinMode(i, INPUT);
-    mcp6.pullUp(i, HIGH);
-    mcp7.pinMode(i, INPUT);
-    mcp7.pullUp(i, HIGH);
-    mcp8.pinMode(i, INPUT);
-    mcp8.pullUp(i, HIGH);
+    mcp1.pinMode(i, INPUT_PULLUP);
+    mcp2.pinMode(i, INPUT_PULLUP);
+    mcp3.pinMode(i, INPUT_PULLUP);
+    mcp4.pinMode(i, INPUT_PULLUP);
+    mcp5.pinMode(i, INPUT_PULLUP);
+    mcp6.pinMode(i, INPUT_PULLUP);
+    mcp7.pinMode(i, INPUT_PULLUP);
+    mcp8.pinMode(i, INPUT_PULLUP);
   }
   
   for (int i = IROFFSET; i < NUMTARGETS+IROFFSET; i++) {
@@ -606,7 +572,7 @@ void setup() {
   }
 
   //button interrupt
-  pinMode(STARTBUTTONPIN, INPUT_PULLUP)  //Start button, LOW when pressed
+  pinMode(STARTBUTTONPIN, INPUT_PULLUP);  //Start button, LOW when pressed
   attachInterrupt(digitalPinToInterrupt(STARTBUTTONPIN), buttonPressed, FALLING);
 
   // Game Input Buttons to Move Bar 
@@ -672,12 +638,9 @@ void setup() {
  Wire.write(0x00); // set all of port B to outputs
  Wire.endTransmission();
   
-// ball return stepper motor
-const int stepsPerRevolution=800; //not used but for reference
-int stepsFor30Degrees=67; //800*(30/360) rounded as int
-myStepper.setSpeed(MAX_SPEED); //setSpeed only take a positive number
-motorR.setSpeed(MAX_SPEED)
-motorL.setSpeed(MAX_SPEED)
+motorBallReturn.setSpeed(MAX_SPEED); //setSpeed only take a positive number
+motorR.setSpeed(MAX_SPEED);
+motorL.setSpeed(MAX_SPEED);
 resetBar();
 }
 
@@ -699,7 +662,7 @@ void loop() {
 
   if (winGame) {
     digitalWrite(targetLEDPin, LOW); 
-    AllTargetLEDs();
+    flashAllTargetLEDs();
     displayWinMessage();
   } else if (loseGame){
     digitalWrite(targetLEDPin, LOW); 
