@@ -1,0 +1,184 @@
+{
+    "version": 1,
+    "author": "Anonymous maker",
+    "editor": "wokwi",
+    "parts": [
+      { "type": "wokwi-arduino-mega", "id": "mega", "top": 125.4, "left": 111.6, "attrs": {} },
+      {
+        "type": "wokwi-pushbutton",
+        "id": "start",
+        "top": -70.6,
+        "left": 614.4,
+        "attrs": { "color": "red" }
+      },
+      {
+        "type": "wokwi-pushbutton",
+        "id": "joystk-r-up",
+        "top": -195.4,
+        "left": 451.2,
+        "attrs": { "color": "red" }
+      },
+      {
+        "type": "wokwi-pushbutton",
+        "id": "joystk-r-down",
+        "top": -137.8,
+        "left": 451.2,
+        "attrs": { "color": "red" }
+      },
+      {
+        "type": "wokwi-pushbutton",
+        "id": "joystk-l-up",
+        "top": -176.2,
+        "left": 326.4,
+        "attrs": { "color": "red" }
+      },
+      {
+        "type": "wokwi-pushbutton",
+        "id": "joystk-l-down",
+        "top": -128.2,
+        "left": 326.4,
+        "attrs": { "color": "red" }
+      },
+      {
+        "type": "wokwi-a4988",
+        "id": "drv1-bar-left",
+        "top": -71.8,
+        "left": -177.2,
+        "rotate": 270,
+        "attrs": {}
+      },
+      {
+        "type": "wokwi-stepper-motor",
+        "id": "stepper-bar-left",
+        "top": -341.09,
+        "left": -258.32,
+        "attrs": { "display": "angle" }
+      },
+      {
+        "type": "wokwi-a4988",
+        "id": "drv2-bar-right",
+        "top": -62.2,
+        "left": 72.4,
+        "rotate": 270,
+        "attrs": {}
+      },
+      {
+        "type": "wokwi-stepper-motor",
+        "id": "stepper-bar-right",
+        "top": -341.09,
+        "left": -8.72,
+        "attrs": { "display": "angle" }
+      },
+      {
+        "type": "wokwi-tm1637-7segment",
+        "id": "sevseg-player",
+        "top": 326.36,
+        "left": 74.23,
+        "attrs": { "color": "red" }
+      },
+      {
+        "type": "wokwi-tm1637-7segment",
+        "id": "sevseg-highscore",
+        "top": 441.56,
+        "left": 74.23,
+        "attrs": { "color": "red" }
+      },
+      {
+        "type": "wokwi-text",
+        "id": "no-simulation-available-note",
+        "top": 163.2,
+        "left": -268.8,
+        "attrs": {
+          "text": "Pins for components unavailable in wokwi:\n 1. 24,26,28 - 'Spark' PCB\n2. A15 - Mux data\n3. 46, 48, 50, 47, 49, 51 - Mux select pins"
+        }
+      },
+      {
+        "type": "wokwi-pushbutton",
+        "id": "lose-game-button",
+        "top": 63.8,
+        "left": 614.4,
+        "attrs": { "color": "red" }
+      },
+      {
+        "type": "wokwi-text",
+        "id": "lose-game-text",
+        "top": 76.8,
+        "left": 710.4,
+        "attrs": { "text": "Simulate\n'lose game'" }
+      },
+      {
+        "type": "wokwi-pushbutton",
+        "id": "win-level-button",
+        "top": 6.2,
+        "left": 614.4,
+        "attrs": { "color": "green" }
+      },
+      {
+        "type": "wokwi-text",
+        "id": "win-game-text",
+        "top": 9.6,
+        "left": 710.4,
+        "attrs": { "text": "Simulate\n'win current level'" }
+      },
+      {
+        "type": "wokwi-text",
+        "id": "start-game-text",
+        "top": -115.2,
+        "left": 700.8,
+        "attrs": { "text": "Start/reset game" }
+      },
+      {
+        "type": "wokwi-text",
+        "id": "right-joystick-text",
+        "top": -192,
+        "left": 547.2,
+        "attrs": { "text": "Right 'joystick'\n(up)\n(down)" }
+      },
+      {
+        "type": "wokwi-text",
+        "id": "left-joystick-text",
+        "top": -288,
+        "left": 326.4,
+        "attrs": { "text": "Left 'joystick'\n(up)\n(down)" }
+      }
+    ],
+    "connections": [
+      [ "start:1.l", "mega:GND.1", "black", [ "v9.6", "h-383.8" ] ],
+      [ "start:2.r", "mega:2", "violet", [ "h9.8", "v38.6", "h-284" ] ],
+      [ "joystk-r-up:1.l", "mega:GND.1", "black", [ "h-220.8", "v28" ] ],
+      [ "joystk-r-up:2.r", "mega:3", "green", [ "h12.75", "v96.2", "h-190.85" ] ],
+      [ "joystk-r-down:1.l", "mega:GND.1", "black", [ "h-9.6", "v-86.4", "h-191.8" ] ],
+      [ "joystk-r-down:2.r", "mega:4", "blue", [ "h21.18", "v38.6", "h-189.58" ] ],
+      [ "joystk-l-up:1.l", "mega:GND.1", "black", [ "h-96", "v297.6" ] ],
+      [ "joystk-l-up:2.r", "mega:5", "orange", [ "h29", "v86.6", "h-91.7" ] ],
+      [ "joystk-l-down:1.l", "mega:GND.1", "black", [ "h-96", "v124.8", "h0.2" ] ],
+      [ "joystk-l-down:2.r", "mega:6", "yellow", [ "h19.4", "v19.4", "h-91.6" ] ],
+      [ "drv1-bar-left:1B", "stepper-bar-left:B-", "black", [ "v0" ] ],
+      [ "drv1-bar-left:1A", "stepper-bar-left:B+", "green", [ "v0" ] ],
+      [ "stepper-bar-left:A+", "drv1-bar-left:2A", "blue", [ "v0" ] ],
+      [ "stepper-bar-left:A-", "drv1-bar-left:2B", "red", [ "v0" ] ],
+      [ "drv1-bar-left:SLEEP", "drv1-bar-left:RESET", "green", [ "v15.92", "h-9.9" ] ],
+      [ "drv1-bar-left:STEP", "mega:9", "purple", [ "v124.8", "h355.9" ] ],
+      [ "drv1-bar-left:DIR", "mega:10", "orange", [ "v115.2", "h336.3" ] ],
+      [ "drv2-bar-right:1B", "stepper-bar-right:B-", "black", [ "v0" ] ],
+      [ "drv2-bar-right:1A", "stepper-bar-right:B+", "green", [ "v0" ] ],
+      [ "stepper-bar-right:A+", "drv2-bar-right:2A", "blue", [ "v0" ] ],
+      [ "stepper-bar-right:A-", "drv2-bar-right:2B", "red", [ "v0" ] ],
+      [ "drv2-bar-right:SLEEP", "drv2-bar-right:RESET", "green", [ "v15.92", "h-9.9" ] ],
+      [ "drv2-bar-right:STEP", "mega:7", "pink", [ "v105.6", "h128.8" ] ],
+      [ "drv2-bar-right:DIR", "mega:8", "yellow", [ "v96.4", "h34.66" ] ],
+      [ "sevseg-player:CLK", "mega:32", "green", [ "h326.4", "v-173.9" ] ],
+      [ "sevseg-player:DIO", "mega:34", "blue", [ "h316.8", "v-174" ] ],
+      [ "sevseg-player:VCC", "mega:5V", "red", [ "h28.8", "v-64.5" ] ],
+      [ "sevseg-player:GND", "mega:GND.2", "black", [ "h38.4", "v-74.1" ] ],
+      [ "sevseg-highscore:CLK", "mega:36", "yellow", [ "h374.4", "v-289.1" ] ],
+      [ "sevseg-highscore:DIO", "mega:38", "white", [ "h364.8", "v-269.95" ] ],
+      [ "sevseg-highscore:VCC", "mega:5V", "red", [ "h28.8", "v-179.7" ] ],
+      [ "sevseg-highscore:GND", "mega:GND.2", "black", [ "h38.4", "v-189.3" ] ],
+      [ "lose-game-button:1.l", "mega:GND.1", "black", [ "h-307.2", "v0", "h-76.6" ] ],
+      [ "lose-game-button:1.r", "mega:14", "white", [ "h12.75", "v96.2", "h-190.85" ] ],
+      [ "win-level-button:1.l", "mega:GND.1", "black", [ "h-220.8", "v0", "h-163" ] ],
+      [ "win-level-button:1.r", "mega:15", "green", [ "h9.8", "v86.4", "h-299.6" ] ]
+    ],
+    "dependencies": {}
+  }

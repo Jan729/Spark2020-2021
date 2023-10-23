@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <Stepper.h>
 #include "RunningAverage.h"
 #include "SevSeg.h"
@@ -46,7 +47,7 @@
 #define MUX_SELECT_B 49
 #define MUX_SELECT_C 51
 
-int LED = 13; // connect Led to arduino pin 13
+int BUILTIN_LED = 13; // connect Led to arduino pin 13
 
 #define STEPS_PER_REV 800 //DRV driver
 #define CEILING 0                //highest height of bar
@@ -498,14 +499,14 @@ void displayWinMessage() {
     sevseg1.refreshDisplay(); 
     sevseg2.setChars("o");
     sevseg2.refreshDisplay(); 
-    sevseg3.setNumber("u");
+    sevseg3.setChars("u");
     sevseg3.refreshDisplay(); 
     delay(500);
     sevseg1.setChars("w");
     sevseg1.refreshDisplay(); 
     sevseg2.setChars("i");
     sevseg2.refreshDisplay(); 
-    sevseg3.setNumber("n");
+    sevseg3.setChars("n");
     sevseg3.refreshDisplay(); 
     delay(500);
   }
@@ -517,21 +518,21 @@ void displayLoseMessage() {
     sevseg1.refreshDisplay(); 
     sevseg2.setChars("o");
     sevseg2.refreshDisplay(); 
-    sevseg3.setNumber("u");
+    sevseg3.setChars("u");
     sevseg3.refreshDisplay(); 
     delay(500);
     sevseg1.setChars("l");
     sevseg1.refreshDisplay(); 
     sevseg2.setChars("o");
     sevseg2.refreshDisplay(); 
-    sevseg3.setNumber("-");
+    sevseg3.setChars("-");
     sevseg3.refreshDisplay(); 
     delay(500);
-    sevseg1.setNumber("e");
+    sevseg1.setChars("e");
     sevseg1.refreshDisplay(); 
     sevseg2.setChars("!");
     sevseg2.refreshDisplay(); 
-    sevseg3.setNumber("!");
+    sevseg3.setChars("!");
     sevseg3.refreshDisplay(); 
     delay(500);
   }
