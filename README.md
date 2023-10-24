@@ -14,3 +14,15 @@ TL;DR version:
 6. PlatformIO will look for files in the `src` folder to compile. Click on `src/main.cpp`, then click the checkmark at the bottom of the screen to verify your code (next to the house button)
 7. If you get red squiggles under the `#include` directives, go to PlatformIO Home (house button) > Libraries > search for and install the library to the Spark2020-2021 project
 8. When the compiler shows `SUCCESS`, run the simulation with `ctrl-shift-p` `Wokwi: Start Simulator`
+
+
+#### ECE Notes
+Arduino Pin count
+- MOTORS – 6 digital driver pins (step and dir x3 drivers, right bar, left bar, ball return)
+- IR SENSORS – 1 analog, 6 digital (for muxes)
+- LED + SHIFT REGISTOR – 3 digital
+- Reset/Start button - 1 digital interrupt pin
+- Left joystick - 2 digital pins (up and down)
+- Right joystick - 2 digital pins (up and down)
+- Hex displays () - 4 digital pins total, 2 per 4 digits, CLK and DIO
+(reference: https://www.instructables.com/How-to-Use-the-TM1637-Digit-Display-With-Arduino/)

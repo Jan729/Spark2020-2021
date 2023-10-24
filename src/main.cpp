@@ -1,4 +1,5 @@
-#include <Arduino.h>
+#include "global-variables.h"
+#include "functions.h"
 #include <Stepper.h>
 #include "RunningAverage.h"
 #include "SevSeg.h"
@@ -7,79 +8,10 @@
 #include <Adafruit_MCP23X17.h>
 #include <avr/interrupt.h>
 
-/**********CONSTANTS*****************************/
-#define BOTTOMPIN 44 // FIXME this pin is for the sensor at the bottom of the backboard ramp
-                     // add this IR sensor to the mux circuit
-#define SCOREINCREASE 10
-#define NUMTARGETS 30
-#define IROFFSET 25
-#define STARTBUTTONPIN 2
-#define JOYSTICK_R_UP 3
-#define JOYSTICK_R_DOWN 4
-#define JOYSTICK_L_UP 5
-#define JOYSTICK_L_DOWN 6
+/************LOCAL VARIABLE DECLARATIONS **********************/
+// To make a variable global, add it to
+// global-variables.h with an extern definition
 
-#define MOTOR_R_STEP 7
-#define MOTOR_R_DIR  8
-#define MOTOR_L_STEP 9
-#define MOTOR_L_DIR  10
-#define RESET_MOTOR_STEP 11
-#define RESET_MOTOR_DIR 12
-
-// fixme give these a better name
-#define SPARK_PCB_1 24
-#define SPARK_PCB_2 26
-#define SPARK_PCB_3 28
-
-#define BAR_SENSOR_PIN 30 // todo: add sensor to calibrate bar position when display powered on
-#define HEX_PLAYER_CLK 32
-#define HEX_PLAYER_DIO 34
-#define HEX_HIGHSCORE_CLK 36
-#define HEX_HIGHSCORE_DIO 38
-
-// place the mux pins along the same row on the mega, next to the analog pins
-// fixme give these a better name
-#define MUX_DATA A15
-#define MUX_SELECT_1 46
-#define MUX_SELECT_2 48
-#define MUX_SELECT_3 50
-#define MUX_SELECT_A 47
-#define MUX_SELECT_B 49
-#define MUX_SELECT_C 51
-
-int BUILTIN_LED = 13; // connect Led to arduino pin 13
-
-#define STEPS_PER_REV 800 //DRV driver
-#define CEILING 0                //highest height of bar
-#define FLOOR 299             //bottom of the playing area, not actually the floor
-#define BALL_RETURN_HEIGHT 388 //lowest height of bar, where bar will pick up ball
-#define MAX_BAR_TILT 38         //maximum vertical slope of bar, aka barPosRight - barPosLeft
-#define MAX_SPEED 200 //in rpm
-#define STEP_INCR 800 //steps taken on each loop() iteration
-#define STEPS_30_DEG 67
-#define BALL_RETURN_DELAY_MS 2000 //time to wait until a new ball has rolled onto bar
-
-// FOR WOKWI TESTING ONLY:
-#define LOSE_GAME_BUTTON 14
-#define WIN_LEVEL_BUTTON 15
-
-#define NUM_IR_SAMPLES 10 // @ginny please adjust as you see fit
-
-/*
-Pin count
-MOTORS – 6 digital driver pins (step and dir x3 drivers, right bar, left bar, ball return)
-IR SENSORS – 1 analog, 6 digital (for muxes)
-LED + SHIFT REGISTOR – 3 digital
-Reset/Start button - 1 digital interrupt pin
-Left joystick - 2 digital pins (up and down)
-Right joystick - 2 digital pins (up and down)
-Hex displays () - 4 digital pins total, 2 per 4 digits, CLK and DIO
-(reference: https://www.instructables.com/How-to-Use-the-TM1637-Digit-Display-With-Arduino/)
-
-*/
-/************END OF CONSTANTS*********************/
-
-/************GLOBAL VARIABLES**********************/
 // spark PCB
 // todo: change these to the correct chip: SN74HC595N
 Adafruit_MCP23X17 mcp1; //shift registers; 8 of them, each with 16 pins
@@ -94,65 +26,83 @@ Adafruit_MCP23X17 mcp8;
 RunningAverage targetIRBuffer(NUM_IR_SAMPLES); // stores IR sensor data
 int targetHoles[NUMTARGETS]; // stores pin numbers of target LEDs to light up
 
-volatile bool playingGame = true; //true if someone is playing, false if game over
-bool winGame = false; 
-bool loseGame = false;
-int score = 0;
-int targetDifficulty = 0;
-int level = 0;
-int targetLEDPin = 0;
-int targetSensorPin = 0;
-bool targetBroken = false;
-bool bottomBroken = false;
+volatile bool playingGame; //true if someone is playing, false if game over
+bool winGame; 
+bool loseGame;
+int score;
+int targetDifficulty;
+int level;
+int targetLEDPin;
+int targetSensorPin;
+bool targetBroken;
+bool bottomBroken;
 
 // hex display variables
-int highscore = 0;
+int highscore;
 
 //global vars for pins for input buttons 
-int left_button = 7;
-int right_button = 8;
+int left_button;
+int right_button;
 
 //global variables for timing 
 unsigned long finishTime;  //time when the ball drops into target hole, resets each round
 unsigned long idleTime;
-volatile long debounce_time = 0;
-volatile long current_button_time = 0;
+volatile long debounce_time;
+volatile long current_button_time;
 
 //global vars for bar movement
-int moveLeftBarUp = 0;
-int moveRightBarUp = 0;
-int barPosL = FLOOR;
-int barPosR = FLOOR;
-int barTilt = 0;
+int moveLeftBarUp;
+int moveRightBarUp;
+int barPosL;
+int barPosR;
+int barTilt;
 Stepper motorR = Stepper(STEPS_PER_REV, MOTOR_R_STEP, MOTOR_R_DIR);
 Stepper motorL = Stepper(STEPS_PER_REV, MOTOR_L_STEP, MOTOR_L_DIR);
-int stepsPerRevolution = 800;
+int stepsPerRevolution;
 Stepper motorBallReturn = Stepper(STEPS_PER_REV, RESET_MOTOR_STEP, RESET_MOTOR_DIR); 
 
 SevSeg sevseg1;
 SevSeg sevseg2;
 SevSeg sevseg3;
 
-/************END OF GLOBAL VARIABLES**********************/
+/************END OF LOCAL DECLARATIONS**********************/
 
-/**********HELPER FUNCTION PROTOTYPES******************/
-void waitToStartGame();
-void updateTarget();
-void resetBall();
-void resetGame();
-void checkIdleTime();
-bool beamBroken(int target);
-void ballEntry();
-void moveBar();
-void resetBar();
-void updateLights(int lastHole, int newHole);
-void updateScore();
-void displayScore();
-void sethighScore();
-void flashAllTargetLEDs();
-void displayWinMessage();
-void displayLoseMessage();
-/******END OF HELPER FUNCTION PROTOTYPES***************/
+void resetAllVariables() {
+  playingGame = true; //true if someone is playing, false if game over
+  winGame = false; 
+  loseGame = false;
+  score = 0;
+  targetDifficulty = 0;
+  level = 0;
+  targetLEDPin = 0;
+  targetSensorPin = 0;
+  targetBroken = false;
+  bottomBroken = false;
+
+  // hex display variables
+  highscore = 0;
+
+  //global vars for pins for input buttons 
+  left_button = 7;
+  right_button = 8;
+
+  //global variables for timing 
+  finishTime = 0;  //time when the ball drops into target hole, resets each round
+  idleTime = 0;
+  debounce_time = 0;
+  current_button_time = 0;
+
+  //global vars for bar movement
+  moveLeftBarUp = 0;
+  moveRightBarUp = 0;
+  barPosL = FLOOR;
+  barPosR = FLOOR;
+  barTilt = 0;
+  motorR = Stepper(STEPS_PER_REV, MOTOR_R_STEP, MOTOR_R_DIR);
+  motorL = Stepper(STEPS_PER_REV, MOTOR_L_STEP, MOTOR_L_DIR);
+  stepsPerRevolution = 800;
+  motorBallReturn = Stepper(STEPS_PER_REV, RESET_MOTOR_STEP, RESET_MOTOR_DIR); 
+}
 
 /**********START OF HELPER FUNCTION IMPLEMENTATIONS*******************/
 
@@ -317,76 +267,6 @@ void ballEntry() {
 }
 
 /************ END OF BALL DETECTION FUNCTIONS ***********/
-
-/*********** START OF BAR MOVEMENT FUNCTIONS *********/
-
-void moveBar()
-{
-  // TODO: the bar will only move up for now. add down controls if the game is too hard
-    if (moveRightBarUp && barPosR > CEILING && barTilt < MAX_BAR_TILT)
-    { //move right side of bar UP
-      motorR.step(STEP_INCR);
-      barPosR-= 1;
-    }
-
-    if (moveLeftBarUp && barPosL > CEILING && barTilt > -MAX_BAR_TILT)
-    { //move left side of bar UP
-      motorL.step(STEP_INCR);
-      barPosL-= 1;
-    }
-
-  barTilt = barPosL - barPosR;
-}
-
-//lowers bar to ball return area, calls resetBall(), then lifts bar to start of game area
-//assumes there won't be a ball on the bar when resetBar() is called
-void resetBar()
-{
-  motorR.setSpeed(MAX_SPEED);
-  motorL.setSpeed(MAX_SPEED);
-
-  //if left side of bar is higher, lower it to the same height as right side
-  while(barPosL < barPosR) {
-    motorL.step(STEP_INCR);
-    barPosL+= 1;
-    
-  }
-
-   //if right side of bar is higher, lower it to the same height as left side
-  while(barPosR < barPosL) {
-    motorR.step(STEP_INCR);
-    barPosR+= 1;
-  }
-
-  //lower both sides of bar to ball return height
-  
-  while (barPosL < BALL_RETURN_HEIGHT)
-  {
-  //when bar triggers the bar sensor, reset the bar's position variables  
-  if(digitalRead(BAR_SENSOR_PIN) == LOW) {
-     barPosL = FLOOR;
-     barPosR = FLOOR;
-  }
-
-   motorL.step(STEP_INCR);
-   motorR.step(STEP_INCR); 
-   barPosL+= 1;
-   barPosR+= 1;
-  }
-
-  resetBall();
-
-  //lift bar to start of playing area
-  while (barPosL > FLOOR)
-  {
-    motorL.step(-STEP_INCR);
-    motorR.step(-STEP_INCR);
-    barPosL-= 1;
-    barPosR-= 1;
-  }
-}
-
-/********** END OF BAR MOVEMENT FUNCTIONS ************/
 
 /************ START OF OUTPUT FUNCTIONS ***********/
 void updateLights(int lastHole, int newHole){
