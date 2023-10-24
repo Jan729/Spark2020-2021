@@ -1,6 +1,5 @@
-# Spark2020-2021
 ~~Ice Cold Beer~~ 
-Remy's Quest :mouse: :cheese:
+# Remy's Quest :mouse: :cheese:
 
 #### How to simulate this project
 See [Getting Started with Wokwi for VS Code](https://docs.google.com/document/d/1XQ6oEajXWh64AKem3sj6RQL7GPWH-MVa7xeWXK2pB6A/edit#heading=h.9a71xmgofye9) for a detailed guide.
@@ -15,6 +14,20 @@ TL;DR version:
 7. If you get red squiggles under the `#include` directives, go to PlatformIO Home (house button) > Libraries > search for and install the library to the Spark2020-2021 project
 8. When the compiler shows `SUCCESS`, run the simulation with `ctrl-shift-p` `Wokwi: Start Simulator`
 
+#### How to add code to this project
+Put your code in the src/ folder (otherwise the simulator will not find your code).
+
+To add another file with helper functions:
+1. Create a new file in src/ and add the following
+  ```
+#include <Arduino.h>
+#include "functions.h"
+#include "global-variables.h"
+```
+2. Declare any variables in `main.cpp`
+3. To make the variable accessible across files, define the variables again with `extern` in `global-variables.h`
+4. Declare function prototypes in `functions.h`
+5. Write your functions in the new file you created
 
 #### ECE Notes
 Arduino Pin count
