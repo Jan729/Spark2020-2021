@@ -1,7 +1,24 @@
 #include <Arduino.h>
 #include "functions.h"
 #include "global-variables.h"
-/*********** START OF BAR MOVEMENT FUNCTIONS *********/
+
+void pollBarJoysticks() {// all buttons are active low
+  if (digitalRead(JOYSTICK_R_UP) == LOW) {
+    rightBarInput = 1;
+  } else if (digitalRead(JOYSTICK_R_DOWN) == LOW) {
+    rightBarInput = -1;
+  } else {
+    rightBarInput = 0;
+  }
+
+  if (digitalRead(JOYSTICK_L_UP) == LOW) {
+    leftBarInput = 1;
+  } else if (digitalRead(JOYSTICK_L_DOWN) == LOW) {
+    leftBarInput = -1;
+  } else {
+    leftBarInput = 0;
+  }
+}
 
 void moveBar()
 {
@@ -87,4 +104,10 @@ void resetBarAndBall()
   }
 }
 
-/********** END OF BAR MOVEMENT FUNCTIONS ************/
+void resetBall() { // TODO check +ve and -ve direction
+    motorBallReturn.step(STEPS_30_DEG);
+    delay(BALL_RETURN_DELAY_MS);
+    motorBallReturn.step(-STEPS_30_DEG);
+  
+  Serial.println("reset ball");
+}

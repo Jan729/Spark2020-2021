@@ -1,11 +1,13 @@
 /**********HELPER FUNCTION PROTOTYPES******************/
 void waitToStartGame();
-void updateTarget();
+void resetAllVariables();
+void incrementLevel();
 void resetBall();
 void resetGame();
 void checkIdleTime();
-bool beamBroken(int target);
+bool beamBroken();
 void pollIRSensors();
+void pollBarJoysticks();
 void moveBar();
 void resetBarAndBall();
 void updateLights(int lastHole, int newHole);

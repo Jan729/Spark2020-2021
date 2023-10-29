@@ -94,6 +94,8 @@ extern int targetLEDPin;
 extern int targetSensorPin;
 extern bool targetBroken;
 extern bool bottomBroken;
+extern bool wonLevelState;
+extern bool ballAtBottomState;
 
 // hex display variables
 extern int highscore;

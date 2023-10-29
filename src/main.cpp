@@ -67,6 +67,8 @@ bool ballAtBottomState = false;
 
 /************END OF LOCAL DECLARATIONS**********************/
 
+/****** GAME CONTROL FUNCTIONS ****/
+
 void resetAllVariables() {
   playingGame = true; //true if someone is playing, false if game over
   winGame = false; 
@@ -86,12 +88,6 @@ void resetAllVariables() {
   // hex display variables
   highscore = 0;
 
-  //global variables for timing 
-  finishTime = 0;  //time when the ball drops into target hole, resets each round
-  idleTime = 0;
-  debounce_time = 0;
-  current_button_time = 0;
-
   //global vars for bar movement
   leftBarInput = 0;
   rightBarInput = 0;
@@ -99,9 +95,14 @@ void resetAllVariables() {
   barPosR = FLOOR;
   barTilt = 0;
   stepsPerRevolution = 800;
-}
 
-/**********START OF HELPER FUNCTION IMPLEMENTATIONS*******************/
+  //global variables for timing 
+  finishTime = 0;  //time when the ball drops into target hole, resets each round
+  idleTime = millis();
+  debounce_time = 0;
+  current_button_time = 0;
+  
+}
 
 void waitToStartGame() {
   //wait and do nothing until someone presses "start"
@@ -120,42 +121,13 @@ void waitToStartGame() {
 
 }
 
-void updateTarget() {
-  level++; 
-
-  int oldTarget = targetLEDPin;
-  
-  targetLEDPin++; // TODO select next target LED from spark PCB
-  targetSensorPin++; // TODO select next IR sensor with mux
-
-  if(level > NUMTARGETS){
-    playingGame = false;
-    winGame = true; //win the game
-  }
-
-  updateLights(oldTarget, targetLEDPin);
-}
-
-void resetBall() { // TODO check +ve and -ve direction
-    motorBallReturn.step(STEPS_30_DEG);
-    delay(BALL_RETURN_DELAY_MS);
-    motorBallReturn.step(-STEPS_30_DEG);
-  
-  Serial.println("reset ball");
-}
-
 void resetGame(){
   // TODO calibrate bar if powered off display and bar is in an uknown position
-    level = 1;
-    score = 0;
-    targetLEDPin = 0;
-    targetDifficulty = 0;
-    targetBroken = false;
-    bottomBroken = false;
-    resetBarAndBall();
-    idleTime = millis();
-    displayScore();
-    digitalWrite(targetLEDPin, HIGH);
+  resetAllVariables();
+  resetBarAndBall();
+  
+  displayScore();
+  digitalWrite(targetLEDPin, HIGH);
 }
 
 void checkIdleTime(){
@@ -163,7 +135,6 @@ void checkIdleTime(){
     playingGame = false;
 }
 
-/****** USER INPUT FUNCTIONS ****/
 //ISR for start/stop game button
 void buttonPressed() {
   if (playingGame == true) {
@@ -182,267 +153,7 @@ void buttonPressed() {
   }
 }
 
-void pollBarJoysticks() {// all buttons are active low
-  if (digitalRead(JOYSTICK_R_UP) == LOW) {
-    rightBarInput = 1;
-  } else if (digitalRead(JOYSTICK_R_DOWN) == LOW) {
-    rightBarInput = -1;
-  } else {
-    rightBarInput = 0;
-  }
-
-  if (digitalRead(JOYSTICK_L_UP) == LOW) {
-    leftBarInput = 1;
-  } else if (digitalRead(JOYSTICK_L_DOWN) == LOW) {
-    leftBarInput = -1;
-  } else {
-    leftBarInput = 0;
-  }
-}
-
-/****** END OF USER INPUT FUNCTIONS ****/
-
-/************ BALL DETECTION FUNCTIONS *********/
-
-bool beamBroken(int target) // FIXME this code is outdated
-{
-
-  // bool beamBroke = false;
-
-  // variables will change: // 1 = unbroked, 0 = broke 
-  // int sensorState;
-    
-  // if(targetSensorPin < 16)
-  // {
-  //   sensorState = mcp1.digitalRead(targetSensorPin%16);
-  // }
-  
-  // else if(16 <= targetSensorPin < 32)
-  // {
-  //   sensorState = mcp2.digitalRead(targetSensorPin%16);
-  // }
-  
-  // else
-  // {
-  //   sensorState = mcp3.digitalRead(targetSensorPin%16);
-  // }
-  
-
-  //note that the array index may need to be changed
-  //depending on the actual value of the sensorpin
-  //this implementation assumes all IRs are using contiguous
-  //pins starting at 0
-  //so will probably need an offset (if pins start at 4 for example)
-  
-  // targetIRBuffer.addValue(!beamBroken*5);
-  //fiddle with the number 5 s.t. when beam is broken
-  //it affects the average more
-
-  //maybe change value from 1 to 0 or something else
-  // if (targetIRBuffer.getAverage() > 1) {
-  //   return 1;
-  // }
-  return 0; //!beamBroken; //this way 1 = broken and 0 = unbroken
-}
-
-
-void pollIRSensors() {
-
-#if IS_WOKWI_TEST
-  bool wonLevel = digitalRead(WIN_LEVEL_BUTTON) == LOW;
-  bool ballAtBottom = digitalRead(LOSE_GAME_BUTTON) == LOW;
-  
-  // catch rising edge of test buttons
-  if (wonLevel && !wonLevelState) {
-    wonLevelState = true;
-  } else if (!wonLevel && wonLevelState) {
-    wonLevelState = false;
-  }
-  
-  if (ballAtBottom && !ballAtBottomState) {
-    ballAtBottomState = true;
-  } else if (!ballAtBottom && ballAtBottom) {
-    ballAtBottomState = false;
-  }
-  
-  targetBroken = wonLevelState;
-  bottomBroken = ballAtBottomState;
-#else
-  targetBroken = false; // TODO replace with Ginny's IR sensor polling logic
-  bottomBroken = false; // poll sensor at bottom of the game
-#endif
-
-  if (targetBroken) { //ball fell in good hole
-    Serial.println((String)"Won level " + level);
-    targetBroken = false;
-    wonLevelState = false;
-    resetBarAndBall();
-
-    updateTarget();
-    finishTime = millis();
-    updateScore();
-    displayScore();
-    
-  } else if (bottomBroken) { //ball fell in bad hole  
-    playingGame = false;
-    loseGame = true; // TODO add more than 1 life if game is too hard
-    ballAtBottomState = false;
-  }
-}
-
-/************ END OF BALL DETECTION FUNCTIONS ***********/
-
-/************ START OF OUTPUT FUNCTIONS ***********/
-void updateLights(int lastHole, int newHole){
-  digitalWrite(lastHole, LOW);
-  digitalWrite(newHole, HIGH);
-}
-
-//we can put this array somewhere else
-//for the seven seg display
-//we should probably wait until we know which display
-//we're using to code this
-int num_array[10][7] = {  { 1,1,1,1,1,1,0 },    // 0
-                          { 0,1,1,0,0,0,0 },    // 1
-                          { 1,1,0,1,1,0,1 },    // 2
-                          { 1,1,1,1,0,0,1 },    // 3
-                          { 0,1,1,0,0,1,1 },    // 4
-                          { 1,0,1,1,0,1,1 },    // 5
-                          { 1,0,1,1,1,1,1 },    // 6
-                          { 1,1,1,0,0,0,0 },    // 7
-                          { 1,1,1,1,1,1,1 },    // 8
-                          { 1,1,1,0,0,1,1 }};   // 9
-
-int gpio_num_array[10] = {  B01111110,    // 0
-                            B00110000,    // 1
-                            B01101101,    // 2
-                            B01111001,    // 3
-                            B00110011,    // 4
-                            B1011011,    // 5
-                            B01011111,    // 6
-                            B01110000,    // 7
-                            B01111111,    // 8
-                            B01110011 };   // 9
-                         
-void updateScore() {
-  targetDifficulty += 1;
-  score += (30000 - finishTime)/1500 * targetDifficulty/5 ; //TODO: finish this code
-  
-  displayScore();
-  sethighScore();
-}
-
-void displayScore() {
-  int firstDigit = score/100;
-  int secondDigit = (score-firstDigit)/10;
-  int thirdDigit = (score-firstDigit-secondDigit);
-
-  sevseg1.setNumber(firstDigit);
-  sevseg1.refreshDisplay(); 
-  sevseg2.setNumber(secondDigit);
-  sevseg2.refreshDisplay(); 
-  sevseg3.setNumber(thirdDigit);
-  sevseg3.refreshDisplay(); 
-  
-  
-  //update digits on the seven seg display 
-
-// TODO: update this code to work with our current parts
-
-  // Wire.beginTransmission(0x20); //select chip 0x20
-  // Wire.write(0x12); // Select Port A
-  // Wire.write(gpio_num_array[thirdDigit]); // Send data
-  // Wire.endTransmission();
-  // Wire.beginTransmission(0x20); //select chip 0x20
-  // Wire.write(0x13); // Select Port B
-  // Wire.write(gpio_num_array[highFirst]); // Send data
-  // Wire.endTransmission();
-  // Wire.beginTransmission(0x27); //select chip 0x27
-  // Wire.write(0x12); // Select Port A
-  // Wire.write(gpio_num_array[highSecond]); // Send data
-  // Wire.endTransmission();
-  // Wire.beginTransmission(0x27); //select chip 0x27
-  // Wire.write(0x13); // Select Port B
-  // Wire.write(gpio_num_array[highThird]); // Send data
-  // Wire.endTransmission();
-
-}
-
-void sethighScore() {
-  // if (score > highscore) {
-  //   highscore = score;
-  //   int highFirst = high/100;
-  //   int highSecond = (highscore-highFirst)/10;
-  //   int highThird = (highscore-highFirst-highSecond);
-  // }
-}
-
-void flashAllTargetLEDs() {
-    for(int i = 15; i <=0 ; i--) {
-     mcp3.digitalWrite(i, HIGH);
-     delay(100);
-     mcp3.digitalWrite(i, LOW);
-    }
-  
-  for(int i = 15; i <=0 ; i--) {
-     mcp2.digitalWrite(i, HIGH);
-     delay(100);
-     mcp2.digitalWrite(i, LOW);
-    }
-  
-  for(int i = 15; i <=0 ; i--) {
-     mcp1.digitalWrite(i, HIGH);
-     delay(100);
-     mcp1.digitalWrite(i, LOW);
-    }
-}
-
-void displayWinMessage() {
-  for (int i=1; i<=3; i++) {
-    sevseg1.setChars("y");
-    sevseg1.refreshDisplay(); 
-    sevseg2.setChars("o");
-    sevseg2.refreshDisplay(); 
-    sevseg3.setChars("u");
-    sevseg3.refreshDisplay(); 
-    delay(500);
-    sevseg1.setChars("w");
-    sevseg1.refreshDisplay(); 
-    sevseg2.setChars("i");
-    sevseg2.refreshDisplay(); 
-    sevseg3.setChars("n");
-    sevseg3.refreshDisplay(); 
-    delay(500);
-  }
-}
-
-void displayLoseMessage() {
-  for (int i=1; i<=3; i++) {
-    sevseg1.setChars("y");
-    sevseg1.refreshDisplay(); 
-    sevseg2.setChars("o");
-    sevseg2.refreshDisplay(); 
-    sevseg3.setChars("u");
-    sevseg3.refreshDisplay(); 
-    delay(500);
-    sevseg1.setChars("l");
-    sevseg1.refreshDisplay(); 
-    sevseg2.setChars("o");
-    sevseg2.refreshDisplay(); 
-    sevseg3.setChars("-");
-    sevseg3.refreshDisplay(); 
-    delay(500);
-    sevseg1.setChars("e");
-    sevseg1.refreshDisplay(); 
-    sevseg2.setChars("!");
-    sevseg2.refreshDisplay(); 
-    sevseg3.setChars("!");
-    sevseg3.refreshDisplay(); 
-    delay(500);
-  }
-}
-
-/************ END OF OUTPUT FUNCTIONS ***********/
+/****** END OF GAME CONTROL FUNCTIONS ****/
 
 /**********END OF HELPER FUNCTION IMPLEMENTATIONS******/
 
@@ -482,7 +193,7 @@ void setup() {
 
   //button interrupt
   pinMode(STARTBUTTONPIN, INPUT_PULLUP);  //Start button, LOW when pressed
-  attachInterrupt(digitalPinToInterrupt(STARTBUTTONPIN), buttonPressed, FALLING);
+  // attachInterrupt(digitalPinToInterrupt(STARTBUTTONPIN), buttonPressed, FALLING);
 
   // Game Input Buttons to Move Bar 
   pinMode(JOYSTICK_R_UP, INPUT_PULLUP);
@@ -555,7 +266,7 @@ void loop() {
 
   while (playingGame) {
     //TODO: Work out where to call start and end times (NOT DONE)
-    finishTime = millis(); //might not need here depending on when updateTarget is called. 
+    finishTime = millis(); //might not need here depending on when incrementLevel is called. 
   
     pollBarJoysticks(); 
     moveBar();
