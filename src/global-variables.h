@@ -9,6 +9,8 @@
 #pragma once
 
 /**********CONSTANTS*****************************/
+#define IS_WOKWI_TEST true
+
 #define BOTTOMPIN 44 // FIXME this pin is for the sensor at the bottom of the backboard ramp
                      // add this IR sensor to the mux circuit
 #define SCOREINCREASE 10
@@ -97,8 +99,8 @@ extern bool bottomBroken;
 extern int highscore;
 
 //global vars for pins for input buttons 
-extern int left_button;
-extern int right_button;
+extern int leftBarInput;
+extern int rightBarInput;
 
 //global variables for timing 
 extern unsigned long finishTime;  //time when the ball drops into target hole, resets each round
@@ -107,8 +109,8 @@ extern volatile long debounce_time;
 extern volatile long current_button_time;
 
 //global vars for bar movement
-extern int moveLeftBarUp;
-extern int moveRightBarUp;
+extern int leftBarInput;
+extern int rightBarInput;
 extern int barPosL;
 extern int barPosR;
 extern int barTilt;
