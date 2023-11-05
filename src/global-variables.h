@@ -52,7 +52,7 @@
 
 extern int BUILTIN_LED; // connect Led to arduino pin 13
 
-#define STEPS_PER_REV 800 //DRV driver
+#define STEPS_PER_REV 200 //DRV driver
 #define CEILING 0                //highest height of bar
 #define FLOOR 299             //bottom of the playing area, not actually the floor
 #define BALL_RETURN_HEIGHT 388 //lowest height of bar, where bar will pick up ball
