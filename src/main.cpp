@@ -106,6 +106,7 @@ void resetAllVariables() {
 
 void waitToStartGame() { 
     // TODO: add turning off joysticks, LED, IR transceiver
+    Serial.println("waitng for someone to start game");
     while(!playingGame) {
       // do nothing until interrupt changes the state
     }
@@ -253,7 +254,7 @@ void loop() {
 
   waitToStartGame(); 
   resetGame();
-   
+  Serial.println("Game starts!");
   while (playingGame) {
     //TODO: Work out where to call start and end times (NOT DONE)
     // finishTime = millis(); //might not need here depending on when incrementLevel is called. 
@@ -265,26 +266,25 @@ void loop() {
 
   }
 
-  //if idle
-  if (!targetBroken && !bottomBroken){
-    // force ball to any hole?
-    // or don't reset ball next time?
-  } 
   // else wait for someone to start game
 
-  // if (winGame) {
-  //   Serial.println("You win");
-  //   digitalWrite(targetLEDPin, LOW); 
-  //   // flashAllTargetLEDs(); //TODO: change to new code with LED array
-  //   // displayWinMessage();
-  // } else if (loseGame){
-  //   Serial.println("You lose");
-  //   digitalWrite(targetLEDPin, LOW); 
-  //   // displayLoseMessage();
-  // }else {
-  //   // flashAllTargetLEDs();
-  //   // displayLoseMessage();
-  // }
+  if (winGame) {
+    Serial.println("You win");
+    digitalWrite(targetLEDPin, LOW); 
+    // flashAllTargetLEDs(); //TODO: change to new code with LED array
+    // displayWinMessage();
+  } else if (loseGame){
+    Serial.println("You lose");
+    digitalWrite(targetLEDPin, LOW); 
+    // displayLoseMessage();
+  }else {
+    Serial.println("You were idle or you reset the game");
+    // flashAllTargetLEDs();
+    // displayLoseMessage();
+    // TODO: edge case when it is idle: force ball to any hole? or don't reset ball next time?
+  }
 
-  // displayScore(); //replace win/lose message with player score
+  //updateHighScore(); TODO: create this function
+  //displayHighScore(); TODO: create this function
+
 }
