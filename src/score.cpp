@@ -21,15 +21,16 @@ TM1637Display highScoreDisplay(highScoreCLK, highScoreDIO)
 
 display.setBrightness(7); // brightness level from 0 (lowest) to 7 (highest)
 
-void updateScore(score, targetDifficulty, finishTime) {
+void updateScore(score, loseGame, targetDifficulty, finishTime) {
   // calculate score given based on level difficulty and time taken to complete level
   // level difficulty increases incrementally by 1 after each level
-  targetDifficulty += 1;
-  score += 5 * targetDifficulty * (2 - (finishTime/200000)) // score is constant if user completes level after 3 minutes
-                                                            // https://www.desmos.com/calculator/xxpl1mwy9a
-  displayScore(score);
-  sethighScore(score);
->>>>>>> Stashed changes
+  if (!loseGame){
+    targetDifficulty += 1;
+    score += 5 * targetDifficulty * (2 - (finishTime/200000)) // score is constant if user completes level after 3 minutes
+                                                              // https://www.desmos.com/calculator/xxpl1mwy9a
+    displayScore(score);
+    sethighScore(score);
+  }
 }
 
 void displayScore(score) {
