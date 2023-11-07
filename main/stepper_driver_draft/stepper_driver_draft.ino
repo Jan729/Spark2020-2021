@@ -61,9 +61,9 @@
 #define FLOOR 299             //bottom of the playing area, not actually the floor
 #define BALL_RETURN_HEIGHT 388 //lowest height of bar, where bar will pick up ball
 #define MAX_BAR_TILT 38         //maximum vertical slope of bar, aka barPosRight - barPosLeft
-#define MAX_SPEED 200 
-#define STEP_INCR 800 //steps taken on each loop() iteration
-#define STEPS_PER_REV 800 //DRV driver
+#define MAX_SPEED 300
+#define STEP_INCR 2000 //about 1cm in height. steps taken on each loop() iteration
+#define STEPS_PER_REV 200 //DRV driver, 1.8 deg step angle
 #define SPEED_MULT 5           //multiply user input value with this number to set desired stepper speed
 #define BALL_RETURN_DELAY 2000 //time in ms to wait until a new ball has rolled onto bar
 //distance sensors code will give the motors a number within the range [-3, 3]
@@ -116,10 +116,7 @@ int speedBoost = 1; //increment this number to increase the bar speed
 #define R_CEIL A2
 #define MAX_TILT_REACHED A1
 
-const uint8_t JoystickDownPin = 10; //joystick direction
-
 bool swapControls = false;
-int prevSwapReading = LOW;
 
 int userSpeed = 1;
 //end of prototyping variables
@@ -136,11 +133,10 @@ void setup()
 
 
   //LEDS FOR PROTOTYPING ONLY
-  pinMode(R_DOWN, INPUT);
-  pinMode(R_UP, INPUT);
-  pinMode(L_DOWN, INPUT);
-  pinMode(L_UP, INPUT);
-  pinMode(SWAP, INPUT);
+  pinMode(R_DOWN, INPUT_PULLUP);
+  pinMode(R_UP, INPUT_PULLUP);
+  pinMode(L_DOWN, INPUT_PULLUP);
+  pinMode(L_UP, INPUT_PULLUP);
   pinMode(L_FLOOR, OUTPUT);
   pinMode(R_FLOOR, OUTPUT);
   pinMode(L_CEIL, OUTPUT);
@@ -148,46 +144,48 @@ void setup()
   pinMode(MAX_TILT_REACHED, OUTPUT);
    Serial.begin(9600);
 
+for (int i = 0; i < 50; i++) { // nov 6: negative is DOWN
+motorL.step(-STEP_INCR);
+motorR.step(-STEP_INCR);
+}
   //resetBar();
-
-  pinMode(JoystickDownPin, INPUT_PULLUP);
 }
 
 void loop()
 {
   //PROTYPING ONLY - get user input from pushbuttons
-  if (digitalRead(R_UP) == LOW)
-  {
-    userInputRight = 1;
-  }
+  // if (digitalRead(R_UP) == LOW)
+  // {
+  //   userInputRight = 1;
+  // }
 
-  // TODO replace all variables with joystick values
-  // digitalRead(JoystickDownPin) == LOW)
-  else if (digitalRead(R_DOWN  == LOW))
-  {
-    userInputRight = -1;
+  // // TODO replace all variables with joystick values
+  // // digitalRead(JoystickDownPin) == LOW)
+  // else if (digitalRead(R_DOWN  == LOW))
+  // {
+  //   userInputRight = -1;
     
-  }
-  else
-  {
-    userInputRight = 0;
-  }
+  // }
+  // else
+  // {
+  //   userInputRight = 0;
+  // }
 
-  if (digitalRead(L_UP) == LOW)
-  {
-    userInputLeft = 1;
-  }
-  else if (digitalRead(L_DOWN) == LOW)
-  {
-    userInputLeft = -1;
-  }
-  else
-  {
-    userInputLeft = 0;
-  }
+  // if (digitalRead(L_UP) == LOW)
+  // {
+  //   userInputLeft = 1;
+  // }
+  // else if (digitalRead(L_DOWN) == LOW)
+  // {
+  //   userInputLeft = -1;
+  // }
+  // else
+  // {
+  //   userInputLeft = 0;
+  // }
 
-  // TO REMEMBER: no need for swap. user input variables will swap it for us
-    moveBar();
+    
+   moveBar();
 
 }
 
@@ -206,23 +204,23 @@ void moveBar()
 {
     if (userInputRight > 0 && barPosR > CEILING && barTilt < MAX_BAR_TILT)
     { //move right side of bar UP
-      motorR.step(STEP_INCR);
+      motorR.step(-STEP_INCR);
       barPosR-= 1;
     }
     else if (userInputRight < 0 && barPosR < FLOOR && barTilt > -MAX_BAR_TILT)
     { //move right side of bar DOWN
-      motorR.step(-STEP_INCR);
+      motorR.step(STEP_INCR);
       barPosR+= 1;
     }
 
     if (userInputLeft > 0 && barPosL > CEILING && barTilt > -MAX_BAR_TILT)
     { //move left side of bar UP
-      motorL.step(STEP_INCR);
+      motorL.step(-STEP_INCR);
       barPosL-= 1;
     }
     else if (userInputLeft < 0 && barPosL < FLOOR && barTilt < MAX_BAR_TILT)
     { //move left side of bar DOWN
-      motorL.step(-STEP_INCR);
+      motorL.step(STEP_INCR);
       barPosL+= 1;
     }
 
