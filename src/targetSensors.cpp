@@ -2,7 +2,7 @@
 #include "functions.h"
 #include "global-variables.h"
 
-void incrementLevel() {
+void incrementLevel() { 
   level++; 
 
   int oldTarget = targetLEDPin;
@@ -15,7 +15,7 @@ void incrementLevel() {
     winGame = true; //win the game
   }
 
-  updateLights(oldTarget, targetLEDPin);
+  updateLights(oldTarget, targetLEDPin); //TODO: update
 }
 
 void pollIRSensors() {
@@ -50,14 +50,16 @@ void pollIRSensors() {
     wonLevelState = false;
     resetBarAndBall();
 
-    incrementLevel();
     finishTime = millis();
     updateScore();
     displayScore();
+    incrementLevel();
     
   } else if (bottomBroken) { //ball fell into the bottom of the backboard without passing through target 
     playingGame = false;
     loseGame = true; // TODO add more than 1 life if game is too hard
+    updateScore(); 
+    displayScore();
     ballAtBottomState = false;
   }
 }

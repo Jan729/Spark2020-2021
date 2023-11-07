@@ -26,7 +26,6 @@ Adafruit_MCP23X17 mcp8;
 RunningAverage targetIRBuffer(NUM_IR_SAMPLES); // stores IR sensor data
 int targetHoles[NUMTARGETS]; // stores pin numbers of target LEDs to light up
 
-volatile bool playingGame; //true if someone is playing, false if game over
 bool winGame; 
 bool loseGame;
 int score;
@@ -42,7 +41,7 @@ int highscore;
 
 //global variables for timing 
 unsigned long finishTime;  //time when the ball drops into target hole, resets each round
-unsigned long idleTime;
+unsigned long lastIdleTime;
 volatile long debounce_time;
 volatile long current_button_time;
 
@@ -62,6 +61,7 @@ SevSeg sevseg2;
 SevSeg sevseg3;
 
 // main loop control variables
+volatile bool playingGame = false; //true if someone is playing, false if game over
 bool wonLevelState = false;
 bool ballAtBottomState = false;
 
@@ -98,26 +98,17 @@ void resetAllVariables() {
 
   //global variables for timing 
   finishTime = 0;  //time when the ball drops into target hole, resets each round
-  idleTime = millis();
+  lastIdleTime = millis();
   debounce_time = 0;
   current_button_time = 0;
   
 }
 
-void waitToStartGame() {
-  //wait and do nothing until someone presses "start"
-  //then continue with game loop
-
-  //player places hand over one of the sensors to start
-  //has to be high above sensor
-  int start_game_dummy_var = 1;
-  if (start_game_dummy_var == 1) {
-    //start the game
-    playingGame = true;
-    resetGame();
-  }
-  //otherwise do nothing
-  //Serial.println("wait to start the game. pretend someone starts playing game");
+void waitToStartGame() { 
+    // TODO: add turning off joysticks, LED, IR transceiver
+    while(!playingGame) {
+      // do nothing until interrupt changes the state
+    }
 
 }
 
@@ -125,29 +116,27 @@ void resetGame(){
   // TODO calibrate bar if powered off display and bar is in an uknown position
   resetAllVariables();
   resetBarAndBall();
-  
+
   displayScore();
   digitalWrite(targetLEDPin, HIGH);
 }
 
 void checkIdleTime(){
+  unsigned long currentIdleTime = millis();
+  unsigned long idleTime = currentIdleTime  - lastIdleTime;
   if (idleTime/60000 > 5) // 5 minutes of idle
     playingGame = false;
 }
 
-//ISR for start/stop game button
+//ISR for start/stop game button only to change gameState
 void buttonPressed() {
   if (playingGame == true) {
-    Serial.println("button to end game is pressed");
-    //stop game, reset, and wait to start
+    Serial.println("Button to end game is pressed");
     playingGame = false;
-    resetGame();
-    // TO DO: wait to start in main loop, by reading playingGame value. have to redo main loop logic.
     delayMicroseconds(100000); //non-blocking delay to debounce button
   }
   else if(playingGame == false) {
-    Serial.println("button to start game is pressed");
-    //start game
+    Serial.println("Button to start game is pressed");
     playingGame = true;
     delayMicroseconds(100000); //non-blocking delay to debounce button
   }
@@ -193,7 +182,7 @@ void setup() {
 
   //button interrupt
   pinMode(STARTBUTTONPIN, INPUT_PULLUP);  //Start button, LOW when pressed
-  // attachInterrupt(digitalPinToInterrupt(STARTBUTTONPIN), buttonPressed, FALLING);
+  attachInterrupt(digitalPinToInterrupt(STARTBUTTONPIN), buttonPressed, FALLING);
 
   // Game Input Buttons to Move Bar 
   pinMode(JOYSTICK_R_UP, INPUT_PULLUP);
@@ -262,32 +251,40 @@ void setup() {
 
 void loop() {
 
-  waitToStartGame(); //FIXME wait for user to start game and set PlayingGame = true
-
+  waitToStartGame(); 
+  resetGame();
+   
   while (playingGame) {
     //TODO: Work out where to call start and end times (NOT DONE)
-    finishTime = millis(); //might not need here depending on when incrementLevel is called. 
-  
+    // finishTime = millis(); //might not need here depending on when incrementLevel is called. 
+    
     pollBarJoysticks(); 
     moveBar();
-    pollIRSensors();
+    pollIRSensors(); // newTarget, winGame, loseGame is decided here. 
     checkIdleTime();
 
   }
 
-  if (winGame) {
-    Serial.println("You win");
-    digitalWrite(targetLEDPin, LOW); 
-    flashAllTargetLEDs();
-    displayWinMessage();
-  } else if (loseGame){
-    Serial.println("You lose");
-    digitalWrite(targetLEDPin, LOW); 
-  }else {
-    flashAllTargetLEDs();
-    displayLoseMessage();
-  }
+  //if idle
+  if (!targetBroken && !bottomBroken){
+    // force ball to any hole?
+    // or don't reset ball next time?
+  } 
+  // else wait for someone to start game
 
-  displayScore(); //replace win/lose message with player score
-  resetGame();
+  // if (winGame) {
+  //   Serial.println("You win");
+  //   digitalWrite(targetLEDPin, LOW); 
+  //   // flashAllTargetLEDs(); //TODO: change to new code with LED array
+  //   // displayWinMessage();
+  // } else if (loseGame){
+  //   Serial.println("You lose");
+  //   digitalWrite(targetLEDPin, LOW); 
+  //   // displayLoseMessage();
+  // }else {
+  //   // flashAllTargetLEDs();
+  //   // displayLoseMessage();
+  // }
+
+  // displayScore(); //replace win/lose message with player score
 }

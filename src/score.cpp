@@ -2,8 +2,10 @@
 #include "functions.h"
 #include "global-variables.h"
 
-void updateScore() {
-  targetDifficulty += 1;
+void updateScore() { 
+  if (!loseGame) {
+    targetDifficulty += 1;
+  }
   score += (30000 - finishTime)/1500 * targetDifficulty/5 ; //TODO: finish this code
   
   displayScore();
