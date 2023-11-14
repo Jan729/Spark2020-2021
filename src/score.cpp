@@ -17,29 +17,30 @@
 
 // create new instance of the TM1637Display class by passing clk and dio pin values to it
 TM1637Display curScoreDisplay(curScoreCLK, curScoreDIO);
-TM1637Display highScoreDisplay(highScoreCLK, highScoreDIO)
+TM1637Display highScoreDisplay(highScoreCLK, highScoreDIO);
 
-display.setBrightness(7); // brightness level from 0 (lowest) to 7 (highest)
+//TO DO: fix the error
+// display.setBrightness(7); // brightness level from 0 (lowest) to 7 (highest)
 
-void updateScore(score, loseGame, targetDifficulty, finishTime) {
+void updateScore(int score, int loseGame, int targetDifficulty, int finishTime) {
   // calculate score given based on level difficulty and time taken to complete level
   // level difficulty increases incrementally by 1 after each level
   if (!loseGame){
     targetDifficulty += 1;
-    score += 5 * targetDifficulty * (2 - (finishTime/200000)) // score is constant if user completes level after 3 minutes
+    score += 5 * targetDifficulty * (2 - (finishTime/200000)); // score is constant if user completes level after 3 minutes
                                                               // https://www.desmos.com/calculator/xxpl1mwy9a
     displayScore(score);
-    sethighScore(score);
+    sethighScore(score, highscore);
   }
 }
 
-void displayScore(score) {
+void displayScore(int score) {
   curScoreDisplay.clear(); // clear previous value
   delay(500); // delay to make score update more obvious to player
   curScoreDisplay.showNumberDec(score, false); // display new score <- need to test this
 }
 
-void sethighScore(score, highscore) {
+void sethighScore(int score, int highscore) {
   if (score > highscore) {
     highscore = score;
     highScoreDisplay.clear();

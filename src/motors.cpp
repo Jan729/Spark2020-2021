@@ -111,3 +111,7 @@ void resetBall() { // TODO check +ve and -ve direction
   
   Serial.println("reset ball");
 }
+
+void moveBarDown() { // TODO: should make the bar go down by a decided amount
+  // if it's alr at the bottom, don't move it
+}

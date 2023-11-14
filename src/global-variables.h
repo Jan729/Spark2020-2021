@@ -61,6 +61,7 @@ extern int BUILTIN_LED; // connect Led to arduino pin 13
 #define STEP_INCR 800 //steps taken on each loop() iteration
 #define STEPS_30_DEG 67
 #define BALL_RETURN_DELAY_MS 2000 //time to wait until a new ball has rolled onto bar
+#define BAR_DOWN_DELAY_S 5 //TODO: calibrate for continuosly moving bar down
 
 // FOR WOKWI TESTING ONLY:
 #define LOSE_GAME_BUTTON 14

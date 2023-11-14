@@ -41,7 +41,7 @@ int highscore;
 
 //global variables for timing 
 unsigned long finishTime;  //time when the ball drops into target hole, resets each round
-unsigned long lastIdleTime;
+unsigned long lastBarTime;
 volatile long debounce_time;
 volatile long current_button_time;
 
@@ -51,6 +51,7 @@ int rightBarInput;
 int barPosL;
 int barPosR;
 int barTilt;
+unsigned int barDownDelay;
 Stepper motorR = Stepper(STEPS_PER_REV, MOTOR_R_STEP, MOTOR_R_DIR);
 Stepper motorL = Stepper(STEPS_PER_REV, MOTOR_L_STEP, MOTOR_L_DIR);
 int stepsPerRevolution;
@@ -95,10 +96,11 @@ void resetAllVariables() {
   barPosR = FLOOR;
   barTilt = 0;
   stepsPerRevolution = 800;
+  barDownDelay = 50000; //TODO calibrate delay here for bar to go down (e.g. every 5 secs)
 
   //global variables for timing 
   finishTime = 0;  //time when the ball drops into target hole, resets each round
-  lastIdleTime = millis();
+  lastBarTime = millis();
   debounce_time = 0;
   current_button_time = 0;
   
@@ -118,15 +120,15 @@ void resetGame(){
   resetAllVariables();
   resetBarAndBall();
 
-  displayScore();
+  displayScore(score);
   digitalWrite(targetLEDPin, HIGH);
 }
 
-void checkIdleTime(){
-  unsigned long currentIdleTime = millis();
-  unsigned long idleTime = currentIdleTime  - lastIdleTime;
-  if (idleTime/60000 > 5) // 5 minutes of idle
-    playingGame = false;
+bool checkPassingTime(){
+  unsigned long currentTime = millis();
+  unsigned long passingTime = currentTime  - lastBarTime;
+  if (passingTime/1000 > BAR_DOWN_DELAY_S) // 5 seconds of idle 
+    return true;
 }
 
 //ISR for start/stop game button only to change gameState
@@ -261,9 +263,10 @@ void loop() {
     
     pollBarJoysticks(); 
     moveBar();
-    pollIRSensors(); // newTarget, winGame, loseGame is decided here. 
-    checkIdleTime();
-
+    pollIRSensors(); // newTarget, winGame, loseGame is decided here. score is updated here too
+    if (checkPassingTime())
+      lastBarTime = millis();
+      moveBarDown();
   }
 
   // else wait for someone to start game
@@ -284,7 +287,6 @@ void loop() {
     // TODO: edge case when it is idle: force ball to any hole? or don't reset ball next time?
   }
 
-  //updateHighScore(); TODO: create this function
-  //displayHighScore(); TODO: create this function
+  sethighScore(score, highscore);
 
 }
