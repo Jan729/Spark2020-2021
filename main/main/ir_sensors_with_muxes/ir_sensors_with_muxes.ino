@@ -24,7 +24,7 @@ void setup() {
   digitalWrite(B2PIN, LOW);
   digitalWrite(C1PIN, LOW);
 
-  digitalWrite(A2PIN, LOW);
+  digitalWrite(A2PIN, HIGH);
   digitalWrite(B2PIN, LOW);
   digitalWrite(C2PIN, LOW);
   

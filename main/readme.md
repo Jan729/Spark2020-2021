@@ -1,2 +1,0 @@
-- Main sketch to call all other functions
-- Since one arduino can only run one sketch, we'll eventually need to merge code into here
