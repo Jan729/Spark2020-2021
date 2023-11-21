@@ -28,7 +28,6 @@ int targetHoles[NUMTARGETS]; // stores pin numbers of target LEDs to light up
 
 bool winGame; 
 bool loseGame;
-int score;
 int targetDifficulty;
 int level;
 int targetLEDPin;
@@ -37,7 +36,9 @@ bool targetBroken;
 bool bottomBroken;
 
 // hex display variables
-int highscore;
+int bonusScore;
+int curScore;
+int highScore;
 
 //global variables for timing 
 unsigned long finishTime;  //time when the ball drops into target hole, resets each round
@@ -74,8 +75,9 @@ void resetAllVariables() {
   playingGame = true; //true if someone is playing, false if game over
   winGame = false; 
   loseGame = false;
-  score = 0;
-  targetDifficulty = 0;
+  bonusScore = 0
+  curScore = 0;
+  targetDifficulty = 0; //TODO: what's the difference between targetDifficulty and level?
   level = 1;
 
   // control next level and game over conditions
@@ -85,9 +87,6 @@ void resetAllVariables() {
   bottomBroken = false;
   wonLevelState = false;
   ballAtBottomState = false;
-
-  // hex display variables
-  highscore = 0;
 
   //global vars for bar movement
   leftBarInput = 0;
@@ -120,7 +119,7 @@ void resetGame(){
   resetAllVariables();
   resetBarAndBall();
 
-  displayScore(score);
+  resetScores();
   digitalWrite(targetLEDPin, HIGH);
 }
 
