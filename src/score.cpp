@@ -22,16 +22,17 @@ TM1637Display bonusScoreDisplay(bonusScoreCLK, bonusScoreDIO);
 TM1637Display curScoreDisplay(curScoreCLK, curScoreDIO);
 TM1637Display highScoreDisplay(highScoreCLK, highScoreDIO);
 
-bonusScoreDIO.setBrightness(7); // brightness level from 0 (lowest) to 7 (highest)
+bonusScoreDisplay.setBrightness(7); // brightness level from 0 (lowest) to 7 (highest)
 curScoreDisplay.setBrightness(7);
 highScoreDisplay.setBrightness(7);
 
 
 // notes:
 // what happens if game is lost?
+// can the game be won?
 
 
-void setBonus(int bonusScore, int targetDifficulty, int finishTime) { // calculate bonus score base on level and time, display onto hex display
+void displayBonus(int bonusScore, int targetDifficulty, int finishTime) { // calculate bonus score base on level and time, display onto hex display
   // starting from 100, the max bonus points increments by 100 for each level
   // every 3 seconds, the bonus points decreases by 10, until 0 is reached
   
@@ -41,9 +42,7 @@ void setBonus(int bonusScore, int targetDifficulty, int finishTime) { // calcula
   displayScore(bonusScoreDisplay, bonusScore);
 }
 
-
 void updateScore(int curScore, int bonusScore, int highScore) { // after every round, update current score with bonus score
-  
   curScore += bonusScore;
   displayScore(curScoreDisplay, curScore);
   sethighScore(curScore, highScore); // check if high score has been surpassed
@@ -56,6 +55,10 @@ void displayScore(TM1637Display display, int score) {
   curScoreDisplay.showNumberDec(score, false); // display new score <- need to test this
 }
 
+void resetScores() {
+  bonusScoreDisplay.clear();
+  curScoreDisplay.clear();
+}
 
 void sethighScore(int curScore, int highScore) {
   if (curScore > highscore) {      // if high score is updated, blink new high score 3 times
@@ -70,4 +73,26 @@ void sethighScore(int curScore, int highScore) {
     delay(500);
     highScoreDisplay.showNumberDec(highscore, false);
   }
+
+void gameLost() { // display "OOPS" if game is lost
+  uint8_t oops[] = {
+		 SEG_A | SEG_B | SEG_C | SEG_D | SEG_E | SEG_F,  // O
+		 SEG_A | SEG_B | SEG_C | SEG_D | SEG_E | SEG_F,  // O
+		 SEG_A | SEG_B | SEG_E | SEG_F | SEG_G,          // P
+		 SEG_A | SEG_C | SEG_D | SEG_F | SEG_G           // S
+		};
+    curScoreDisplay.clear();
+    curScoreDisplay.setSegments(oops);
+}
+
+void gameWon() { // display "WIN" if game is won
+    uint8_t win[] = {
+		 SEG_C | SEG_D | SEG_E | SEG_F,         // W first half
+		 SEG_B | SEG_C | SEG_D | SEG_E,         // W second half
+		 SEG_B | SEG_C, | SEG_E | SEG_F,        // I + N first half
+		 SEG_B | SEG_C | SEG_D | SEG_E | SEG_F  // N second half
+		};
+    curScoreDisplay.clear();
+    curScoreDisplay.setSegments(win);
+}
 }
