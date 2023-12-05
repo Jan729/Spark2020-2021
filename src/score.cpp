@@ -27,11 +27,6 @@ curScoreDisplay.setBrightness(7);
 highScoreDisplay.setBrightness(7);
 
 
-// notes:
-// what happens if game is lost?
-// can the game be won?
-
-
 void displayBonus(int bonusScore, int targetDifficulty, int finishTime) { // calculate bonus score base on level and time, display onto hex display
   // starting from 100, the max bonus points increments by 100 for each level
   // every 3 seconds, the bonus points decreases by 10, until 0 is reached
@@ -85,7 +80,7 @@ void gameLost() { // display "OOPS" if game is lost
     curScoreDisplay.setSegments(oops);
 }
 
-void gameWon() { // display "WIN" if game is won
+void gameWon() { // display "WIN" if game is won... a little sketchy but best i can do
     uint8_t win[] = {
 		 SEG_C | SEG_D | SEG_E | SEG_F,         // W first half
 		 SEG_B | SEG_C | SEG_D | SEG_E,         // W second half
