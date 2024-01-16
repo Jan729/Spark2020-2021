@@ -62,7 +62,7 @@
 #define BALL_RETURN_HEIGHT 388 //lowest height of bar, where bar will pick up ball
 #define MAX_BAR_TILT 38         //maximum vertical slope of bar, aka barPosRight - barPosLeft
 #define MAX_SPEED 300
-#define STEP_INCR 2000 //about 1cm in height. steps taken on each loop() iteration
+#define STEP_INCR 200 //about 1cm in height. steps taken on each loop() iteration
 #define STEPS_PER_REV 200 //DRV driver, 1.8 deg step angle
 #define SPEED_MULT 5           //multiply user input value with this number to set desired stepper speed
 #define BALL_RETURN_DELAY 2000 //time in ms to wait until a new ball has rolled onto bar
@@ -89,10 +89,10 @@ int speedBoost = 1; //increment this number to increase the bar speed
 // pull RST and SLP to 5V to activate driver
 // note int stepsFor30Degrees=67; //800*(30/360) rounded as int
 
-  #define DIR_R 2
-  #define STEP_R 3
-  #define DIR_L 4
-  #define STEP_L 5
+  #define DIR_R 3
+  #define STEP_R 4
+  #define DIR_L 5
+  #define STEP_L 6
 
   Stepper motorR = Stepper(STEPS_PER_REV, STEP_R, DIR_R);
   Stepper motorL = Stepper(STEPS_PER_REV, STEP_L, DIR_L);
@@ -104,11 +104,10 @@ int speedBoost = 1; //increment this number to increase the bar speed
 
 //FOR PROTOTYPING ONLY. pushbuttons and LED pins
 //these should actually be global variables from other parts of code
-#define L_UP 6 //pushbuttons
-#define L_DOWN 7
-#define R_UP 8
-#define R_DOWN 9
-#define SWAP 10
+#define L_UP 7 //pushbuttons
+#define L_DOWN 8
+#define R_UP 9
+#define R_DOWN 10
 
 #define L_FLOOR A5 //LEDs
 #define L_CEIL A4
@@ -131,7 +130,6 @@ void setup()
   motorR.setSpeed(MAX_SPEED);
   motorL.setSpeed(MAX_SPEED);
 
-
   //LEDS FOR PROTOTYPING ONLY
   pinMode(R_DOWN, INPUT_PULLUP);
   pinMode(R_UP, INPUT_PULLUP);
@@ -144,45 +142,46 @@ void setup()
   pinMode(MAX_TILT_REACHED, OUTPUT);
    Serial.begin(9600);
 
-for (int i = 0; i < 50; i++) { // nov 6: negative is DOWN
-motorL.step(-STEP_INCR);
-motorR.step(-STEP_INCR);
-}
+// for (
+  // // TODO replace all variables with joystick values
+  // digitalRead(JoystickDownPin) == LOW)int i = 0; i < 25; i++) { // nov 6: negative is DOWN
+// motorL.step(STEP_INCR);
+// motorR.step(STEP_INCR);
+// }
+// for (int i = 0; i < 25; i++) {
+// motorL.step(-STEP_INCR);
+// motorR.step(-STEP_INCR);
+// }
   //resetBar();
 }
 
 void loop()
 {
   //PROTYPING ONLY - get user input from pushbuttons
-  // if (digitalRead(R_UP) == LOW)
-  // {
-  //   userInputRight = 1;
-  // }
+  if (digitalRead(R_UP) == LOW)
+  {
+    userInputRight = 1;
+  }  else if (digitalRead(R_DOWN  == LOW))
+  {
+    userInputRight = -1;
+  }
+  else
+  {
+    userInputRight = 0;
+  }
 
-  // // TODO replace all variables with joystick values
-  // // digitalRead(JoystickDownPin) == LOW)
-  // else if (digitalRead(R_DOWN  == LOW))
-  // {
-  //   userInputRight = -1;
-    
-  // }
-  // else
-  // {
-  //   userInputRight = 0;
-  // }
-
-  // if (digitalRead(L_UP) == LOW)
-  // {
-  //   userInputLeft = 1;
-  // }
-  // else if (digitalRead(L_DOWN) == LOW)
-  // {
-  //   userInputLeft = -1;
-  // }
-  // else
-  // {
-  //   userInputLeft = 0;
-  // }
+  if (digitalRead(L_UP) == LOW)
+  {
+    userInputLeft = 1;
+  }
+  else if (digitalRead(L_DOWN) == LOW)
+  {
+    userInputLeft = -1;
+  }
+  else
+  {
+    userInputLeft = 0;
+  }
 
     
    moveBar();
