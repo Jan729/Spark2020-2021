@@ -75,7 +75,7 @@ void resetAllVariables() {
   playingGame = true; //true if someone is playing, false if game over
   winGame = false; 
   loseGame = false;
-  bonusScore = 0
+  bonusScore = 0;
   curScore = 0;
   targetDifficulty = 0; //TODO: what's the difference between targetDifficulty and level?
   level = 1;
@@ -263,9 +263,10 @@ void loop() {
     pollBarJoysticks(); 
     moveBar();
     pollIRSensors(); // newTarget, winGame, loseGame is decided here. score is updated here too
-    if (checkPassingTime())
+    if (checkPassingTime()) {
       lastBarTime = millis();
       moveBarDown();
+    }
   }
 
   // else wait for someone to start game
@@ -279,7 +280,7 @@ void loop() {
     Serial.println("You lose");
     digitalWrite(targetLEDPin, LOW); 
     // displayLoseMessage();
-  }else {
+  } else {
     Serial.println("You were idle or you reset the game");
     // flashAllTargetLEDs();
     // displayLoseMessage();

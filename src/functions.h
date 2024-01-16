@@ -15,6 +15,7 @@ void updateLights(int lastHole, int newHole);
 void updateScore(int score, int loseGame, int targetDifficulty, int finishTime);
 void displayScore(int score);
 void sethighScore(int score, int highscore);
+void resetScores();
 void flashAllTargetLEDs();
 void displayWinMessage();
 void displayLoseMessage();
