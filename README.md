@@ -37,12 +37,12 @@ Walk to the back of the display and face the wires on the backboard. Hole number
 
 The computer power supply (the grey box) is for testing only and does not meet fire safety standards for long-term use. You will need to replace this power supply with the new power supply to the arduino, PCBs, and motor drivers. There is a new 12V power supply reserved for Remy's in the spark garage. Janelle is not sure where the regulator is.
 
-12V goes to the arduino and motors, 3V or 5V goes to everything else depending on the component.
+12V goes to the arduino and motors, 3V or 5V goes to everything else depending on the component. For subsystems that cost more than a few dollars or a few minutes of labour to replace, Janelle recommends splicing a fuse with appropriate current rating into the wire between the regulator and the subsystem's VCC. For example, if the datasheet says the circuit will fry at >1A, pick a 1A fuse.
 
 #### Power supply requirements
-Class 2 fused 12V power supply. Keep it outside of the display, away from flammable materials.
+Class 2 fused 12V power supply. Keep it outside of the display, away from flammable materials. See diagram, where `<--->` are wires.
 ```
-Outlet <---------> power supply <--------------> exposed 12V port <---> 12V to 3V regulator <---> Remy’s build
+Wall outlet <---------> power supply with exposed 12V port <---> 12V to 3V regulator <---> Remy’s build
 ```
 
 
