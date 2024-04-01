@@ -22,10 +22,11 @@ TM1637Display bonusScoreDisplay(bonusScoreCLK, bonusScoreDIO);
 TM1637Display curScoreDisplay(curScoreCLK, curScoreDIO);
 TM1637Display highScoreDisplay(highScoreCLK, highScoreDIO);
 
-bonusScoreDisplay.setBrightness(7); // brightness level from 0 (lowest) to 7 (highest)
-curScoreDisplay.setBrightness(7);
-highScoreDisplay.setBrightness(7);
-
+void setHexDisplayBrightness() {
+  bonusScoreDisplay.setBrightness(7); // brightness level from 0 (lowest) to 7 (highest)
+  curScoreDisplay.setBrightness(7);
+  highScoreDisplay.setBrightness(7);
+}
 
 void displayBonus(int bonusScore, int targetDifficulty, int finishTime) { // calculate bonus score base on level and time, display onto hex display
   // starting from 100, the max bonus points increments by 100 for each level
@@ -41,7 +42,6 @@ void updateScore(int curScore, int bonusScore, int highScore) { // after every r
   curScore += bonusScore;
   displayScore(curScoreDisplay, curScore);
   sethighScore(curScore, highScore); // check if high score has been surpassed
-
 }
 
 void displayScore(TM1637Display display, int score) {
@@ -56,20 +56,21 @@ void resetScores() {
 }
 
 void sethighScore(int curScore, int highScore) {
-  if (curScore > highscore) {      // if high score is updated, blink new high score 3 times
-    highscore = curScore;
+  if (curScore > highScore) {      // if high score is updated, blink new high score 3 times
+    highScore = curScore;
     highScoreDisplay.clear();
     delay(500);
-    highScoreDisplay.showNumberDec(highscore, false);
+    highScoreDisplay.showNumberDec(highScore, false);
     highScoreDisplay.clear();
     delay(500);
-    highScoreDisplay.showNumberDec(highscore, false);
+    highScoreDisplay.showNumberDec(highScore, false);
     highScoreDisplay.clear();
     delay(500);
-    highScoreDisplay.showNumberDec(highscore, false);
+    highScoreDisplay.showNumberDec(highScore, false);
   }
+}
 
-void gameLost() { // display "OOPS" if game is lost
+void displayLoseMessage() { // display "OOPS" if game is lost
   uint8_t oops[] = {
 		 SEG_A | SEG_B | SEG_C | SEG_D | SEG_E | SEG_F,  // O
 		 SEG_A | SEG_B | SEG_C | SEG_D | SEG_E | SEG_F,  // O
@@ -80,14 +81,13 @@ void gameLost() { // display "OOPS" if game is lost
     curScoreDisplay.setSegments(oops);
 }
 
-void gameWon() { // display "WIN" if game is won... a little sketchy but best i can do
+void displayWinMessage() { // display "WIN" if game is won... a little sketchy but best i can do
     uint8_t win[] = {
 		 SEG_C | SEG_D | SEG_E | SEG_F,         // W first half
 		 SEG_B | SEG_C | SEG_D | SEG_E,         // W second half
-		 SEG_B | SEG_C, | SEG_E | SEG_F,        // I + N first half
+		 SEG_B | SEG_C | SEG_E | SEG_F,        // I + N first half
 		 SEG_B | SEG_C | SEG_D | SEG_E | SEG_F  // N second half
 		};
     curScoreDisplay.clear();
     curScoreDisplay.setSegments(win);
-}
 }

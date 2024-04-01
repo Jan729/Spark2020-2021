@@ -168,3 +168,12 @@ To add another file with helper functions:
 3. To make the variable accessible across files, define the variables again with `extern` in `global-variables.h`
 4. Declare function prototypes in `functions.h`
 5. Write your functions in the new file you created
+
+### How to add libraries to a platformio project
+
+1. Click on the house icon on the bottom of vscode. This is platformio home page.
+2. Click on "Libraries" on the left sidebar
+3. Search for the name of the library you want to add
+4. Click on your desired search result
+5. Click "Add to Project" > "Select Project" > "Spark2020-2021"
+6. The new library should be listed in the `platformio.ini` file

@@ -6,6 +6,7 @@
 #include <Wire.h>
 #include <Adafruit_MCP23X17.h>
 #include <avr/interrupt.h>
+#include "TM1637Display.h"
 #pragma once
 
 /**********CONSTANTS*****************************/
@@ -72,7 +73,7 @@ extern int BUILTIN_LED; // connect Led to arduino pin 13
 
 /************GLOBAL VARIABLE DEFINITIONS **********************/
 // spark PCB
-// todo: change these to the correct chip: SN74HC595N
+// todo: change these to the correct chip: SN74HC595N?
 extern Adafruit_MCP23X17 mcp1; //shift registers; 8 of them, each with 16 pins
 extern Adafruit_MCP23X17 mcp2;
 extern Adafruit_MCP23X17 mcp3;
@@ -88,7 +89,6 @@ extern int targetHoles[NUMTARGETS]; // stores pin numbers of target LEDs to ligh
 extern volatile bool playingGame; //true if someone is playing, false if game over
 extern bool winGame; 
 extern bool loseGame;
-extern int score;
 extern int targetDifficulty;
 extern int level;
 extern int targetLEDPin;
@@ -99,7 +99,12 @@ extern bool wonLevelState;
 extern bool ballAtBottomState;
 
 // hex display variables
-extern int highscore;
+extern int highScore;
+extern int curScore;
+extern int bonusScore;
+extern TM1637Display bonusScoreDisplay;
+extern TM1637Display curScoreDisplay;
+extern TM1637Display highScoreDisplay;
 
 //global vars for pins for input buttons 
 extern int leftBarInput;
@@ -121,9 +126,5 @@ extern Stepper motorR;
 extern Stepper motorL;
 extern int stepsPerRevolution;
 extern Stepper motorBallReturn; 
-
-extern SevSeg sevseg1;
-extern SevSeg sevseg2;
-extern SevSeg sevseg3;
 
 /************END OF GLOBAL DEFINITIONS**********************/

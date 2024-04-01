@@ -160,28 +160,7 @@ void setup() {
 
   // TODO initialize spark pcb
   // TODO init IR receivers
-
-  // mcp1.begin_I2C(0);
-  // mcp2.begin_I2C(1);
-  // mcp3.begin_I2C(2);
-  // mcp4.begin_I2C(3);
-  // mcp5.begin_I2C(4);
-  // mcp6.begin_I2C(5);
-  // mcp7.begin_I2C(6);
-  // mcp8.begin_I2C(7);
   
-  // for (int i=0; i<16; i++) {
-  //   mcp1.pinMode(i, INPUT_PULLUP);
-  //   mcp2.pinMode(i, INPUT_PULLUP);
-  //   mcp3.pinMode(i, INPUT_PULLUP);
-  //   mcp4.pinMode(i, INPUT_PULLUP);
-  //   mcp5.pinMode(i, INPUT_PULLUP);
-  //   mcp6.pinMode(i, INPUT_PULLUP);
-  //   mcp7.pinMode(i, INPUT_PULLUP);
-  //   mcp8.pinMode(i, INPUT_PULLUP);
-  // }
-  
-
   //button interrupt
   pinMode(STARTBUTTONPIN, INPUT_PULLUP);  //Start button, LOW when pressed
   attachInterrupt(digitalPinToInterrupt(STARTBUTTONPIN), buttonPressed, FALLING);
@@ -195,54 +174,9 @@ void setup() {
   pinMode(11, OUTPUT); //IR LEDs. keep on at all times
   pinMode(12, OUTPUT);
 
-  //set up seven seg display x3
-  // byte numDigits = 1;
-  // byte digitPins[] = {};
-  // byte segmentPins1[] = {6, 5, 2, 3, 4, 7, 8, 9};
-  // byte segmentPins2[] = {6, 5, 2, 3, 4, 7, 8, 9};
-  // byte segmentPins3[] = {6, 5, 2, 3, 4, 7, 8, 9};
-  // bool resistorsOnSegments = true;
-
-  // byte hardwareConfig = COMMON_ANODE; 
-  // sevseg1.begin(hardwareConfig, numDigits, digitPins, segmentPins1, resistorsOnSegments);
-  // sevseg1.setBrightness(90);
-  // sevseg2.begin(hardwareConfig, numDigits, digitPins, segmentPins2, resistorsOnSegments);
-  // sevseg2.setBrightness(90);
-  // sevseg3.begin(hardwareConfig, numDigits, digitPins, segmentPins3, resistorsOnSegments);
-  // sevseg3.setBrightness(90);
+  // set up hex displays
+  setHexDisplayBrightness();
   
-  // sevseg1.setNumber(0);
-  // sevseg1.refreshDisplay(); 
-  // sevseg2.setNumber(0);
-  // sevseg2.refreshDisplay(); 
-  // sevseg3.setNumber(0);
-  // sevseg3.refreshDisplay(); 
-
-  //set up two gpio expanders
-  //chip 1 address: 0x20
-  //chip 2 address: 0x27
-//  Wire.begin(); //wake up I2C bus
-  // set I/O pins for chip 0x20 to outputs
-//  Wire.beginTransmission(0x20);
-//  Wire.write(0x00); // IODIRA register
-//  Wire.write(0x00); // set all of port A to outputs
-//  Wire.endTransmission();
-//  Wire.beginTransmission(0x20);
-//  Wire.write(0x01); // IODIRB register
-//  Wire.write(0x00); // set all of port B to outputs
-//  Wire.endTransmission();
-
-//  // set I/O pins for chip 0x27 to outputs
-//  Wire.beginTransmission(0x27);
-//  Wire.write(0x00); // IODIRA register
-//  Wire.write(0x00); // set all of port A to outputs
-//  Wire.endTransmission();
-//  Wire.beginTransmission(0x27);
-//  Wire.write(0x01); // IODIRB register
-//  Wire.write(0x00); // set all of port B to outputs
-//  Wire.endTransmission();
-  
-
   //reset stepper motors
   barPosL = FLOOR;
   barPosR = FLOOR;
@@ -286,7 +220,5 @@ void loop() {
     // displayLoseMessage();
     // TODO: edge case when it is idle: force ball to any hole? or don't reset ball next time?
   }
-
-  sethighScore(score, highscore);
 
 }

@@ -51,17 +51,21 @@ void pollIRSensors() {
     resetBarAndBall();
 
     finishTime = millis();
-    updateScore(score, loseGame, targetDifficulty, finishTime);
-    displayScore(score);
+
+    displayBonus(bonusScore, targetDifficulty, finishTime);
+    delay(1000);
+    updateScore(curScore, bonusScore, highScore);
+    displayScore(curScoreDisplay, curScore);
     incrementLevel();
     
   } else if (bottomBroken) { //ball fell into the bottom of the backboard without passing through target 
     playingGame = false;
-    loseGame = true; // TODO add more than 1 life if game is too hard
-    updateScore(score, loseGame, targetDifficulty, finishTime); 
-    displayScore(score);
+    loseGame = true;
+    updateScore(curScore, bonusScore, highScore);
+    displayScore(curScoreDisplay, curScore);
     ballAtBottomState = false;
   }
+
 }
 
 bool beamBroken() // FIXME this code is outdated
