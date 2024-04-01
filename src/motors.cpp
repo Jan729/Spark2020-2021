@@ -1,117 +1,145 @@
 #include <Arduino.h>
 #include "functions.h"
 #include "global-variables.h"
+#include <AccelStepper.h>
 
-void pollBarJoysticks() {// all buttons are active low
-  if (digitalRead(JOYSTICK_R_UP) == LOW) {
-    rightBarInput = 1;
-  } else if (digitalRead(JOYSTICK_R_DOWN) == LOW) {
-    rightBarInput = -1;
-  } else {
-    rightBarInput = 0;
-  }
+void setupBarMotors() {
+  long startPos = CEILING/2;
+  motorR.setCurrentPosition(startPos);
+  motorL.setCurrentPosition(startPos);
+  
+  motorR.setMaxSpeed(MAX_STEPS_PER_SEC);
+  motorL.setMaxSpeed(MAX_STEPS_PER_SEC);
 
+  motorR.setSpeed(INITIAL_STEPS_PER_SEC);
+  motorL.setSpeed(INITIAL_STEPS_PER_SEC);
+
+  motorR.setAcceleration(MAX_STEPS_PER_S_SQUARED);
+  motorL.setAcceleration(MAX_STEPS_PER_S_SQUARED);
+
+  pinMode(JOYSTICK_R_DOWN, INPUT_PULLUP);
+  pinMode(JOYSTICK_R_UP, INPUT_PULLUP);
+  pinMode(JOYSTICK_L_DOWN, INPUT_PULLUP);
+  pinMode(JOYSTICK_L_UP, INPUT_PULLUP);
+}
+
+void pollLeftJoystick() {
   if (digitalRead(JOYSTICK_L_UP) == LOW) {
     leftBarInput = 1;
+    lastBarTime = millis();
   } else if (digitalRead(JOYSTICK_L_DOWN) == LOW) {
     leftBarInput = -1;
+    lastBarTime = millis();
   } else {
     leftBarInput = 0;
+    motorL.setSpeed(0);
   }
+}
+
+void pollRightJoystick() {
+  if (digitalRead(JOYSTICK_R_UP) == LOW) {
+    rightBarInput = 1;
+    lastBarTime = millis();
+  } else if (digitalRead(JOYSTICK_R_DOWN) == LOW) {
+    rightBarInput = -1;
+    lastBarTime = millis();
+  } else {
+    rightBarInput = 0;
+    motorR.setSpeed(0);
+  }
+}
+
+void moveBarLeft() {
+   long barPosR = motorR.currentPosition();
+   long barPosL = motorL.currentPosition();
+   barTilt = barPosL - barPosR;
+
+    if (leftBarInput > 0 && barPosL+STEPS_PER_CALL < CEILING && barTilt < MAX_BAR_TILT)
+    { //move left side of bar UP
+        bool changingDirections = motorL.distanceToGo() < 0;
+        long positionCorrection = changingDirections ? LOOK_AHEAD_STEPS : 0;
+        motorL.moveTo(barPosL+STEPS_PER_CALL+positionCorrection);
+    }
+    else if (leftBarInput < 0 && barPosL-STEPS_PER_CALL > FLOOR && barTilt > -MAX_BAR_TILT)
+    { //move left side of bar DOWN
+        bool changingDirections = motorL.distanceToGo() > 0;
+        long positionCorrection = changingDirections ? LOOK_AHEAD_STEPS : 0;
+        motorL.moveTo(barPosL-STEPS_PER_CALL-positionCorrection);
+    }
+}
+
+void moveBarRight() {
+   long barPosR = motorR.currentPosition();
+   long barPosL = motorL.currentPosition();
+
+    barTilt = barPosL - barPosR;
+
+    if (rightBarInput > 0 && barPosR+STEPS_PER_CALL < CEILING && barTilt > -MAX_BAR_TILT)
+    { //move right side of bar UP
+      bool changingDirections = motorR.distanceToGo() < 0;
+      long positionCorrection = changingDirections ? LOOK_AHEAD_STEPS : 0;
+      motorR.moveTo(barPosR+STEPS_PER_CALL+positionCorrection);
+    }
+    else if (rightBarInput < 0 && barPosR-STEPS_PER_CALL > FLOOR && barTilt < MAX_BAR_TILT)
+    { //move right side of bar DOWN
+      bool changingDirections = motorR.distanceToGo() > 0;
+      long positionCorrection = changingDirections ? LOOK_AHEAD_STEPS : 0;
+      motorR.moveTo(barPosR-STEPS_PER_CALL-positionCorrection);
+    }
+
 }
 
 void moveBar()
 {
-  bool moveRightUp = rightBarInput == 1;
-  bool moveRightDown = rightBarInput == -1;
-  bool moveLeftUp = leftBarInput == 1;
-  bool moveLeftDown = leftBarInput == -1;
+    bool rightBarMoving = motorR.distanceToGo() > LOOK_AHEAD_STEPS || motorR.distanceToGo() < -LOOK_AHEAD_STEPS;
+    bool leftBarMoving = motorL.distanceToGo() > LOOK_AHEAD_STEPS  || motorL.distanceToGo() < -LOOK_AHEAD_STEPS;
 
-  if (moveRightUp && barPosR > CEILING && barTilt < MAX_BAR_TILT)
-  { //move right side of bar UP
-    motorR.step(STEP_INCR);
-    barPosR-= 1;
-  } else if (moveRightDown && barPosR < FLOOR && barTilt > -MAX_BAR_TILT)
-  { //move right side of bar DOWN
-    motorR.step(-STEP_INCR);
-    barPosR-= 1;
-  }
+    if (rightBarMoving) {
+        motorR.run();
+    } else {
+        pollRightJoystick();
+        moveBarRight();
+    }
 
-  if (moveLeftUp && barPosL > CEILING && barTilt > -MAX_BAR_TILT)
-  { //move left side of bar UP
-    motorL.step(STEP_INCR);
-    barPosL-= 1;
-  } else if (moveLeftDown && barPosL < FLOOR && barTilt < MAX_BAR_TILT)
-  { //move left side of bar DOWN
-    motorL.step(-STEP_INCR);
-    barPosL-= 1;
-  }
+    if (leftBarMoving) {
+        motorL.run();
+    } else {
+        pollLeftJoystick();
+        moveBarLeft();
+    }
 
-  barTilt = barPosL - barPosR;
+    if (checkPassingTime()) {
+      //  moveBarDown();
+    }
 }
 
-//lowers bar to ball return area, calls resetBall(), then lifts bar to start of game area
-//assumes there won't be a ball on the bar when resetBar() is called
 void resetBarAndBall()
 {
-  #ifdef IS_WOKWI_TEST
-    Serial.println("dummy reset bar function. sleeping 1s...");
-    delay(1000);
-    barPosL = FLOOR;
-    barPosR = FLOOR;
-    Serial.println("finished resetting bar");
-    return;
-  #endif
+  // TODO hardcode the bar to dump any leftover ball into backboard
 
-  //if left side of bar is higher, lower it to the same height as right side
-  while(barPosL < barPosR) {
-    motorL.step(STEP_INCR);
-    barPosL+= 1;
-  }
-
-   //if right side of bar is higher, lower it to the same height as left side
-  while(barPosR < barPosL) {
-    motorR.step(STEP_INCR);
-    barPosR+= 1;
-  }
-
-  //lower both sides of bar to ball return height
-  
-  while (barPosL < BALL_RETURN_HEIGHT)
-  {
-  //when bar triggers the bar sensor, reset the bar's position variables  
-  if(digitalRead(BAR_SENSOR_PIN) == LOW) {
-     barPosL = FLOOR;
-     barPosR = FLOOR;
-  }
-
-   motorL.step(STEP_INCR);
-   motorR.step(STEP_INCR); 
-   barPosL+= 1;
-   barPosR+= 1;
-   Serial.println("left bar pos: " + barPosL);
-  }
+  motorL.moveTo(BALL_RETURN_HEIGHT);
+  motorR.moveTo(BALL_RETURN_HEIGHT);
 
   resetBall();
 
-  //lift bar to start of playing area
-  while (barPosL > FLOOR)
-  {
-    motorL.step(-STEP_INCR);
-    motorR.step(-STEP_INCR);
-    barPosL-= 1;
-    barPosR-= 1;
-  }
+  motorL.moveTo(FLOOR);
+  motorR.moveTo(FLOOR);
 }
 
-void resetBall() { // TODO check +ve and -ve direction
-    motorBallReturn.step(STEPS_30_DEG);
-    delay(BALL_RETURN_DELAY_MS);
-    motorBallReturn.step(-STEPS_30_DEG);
-  
+void resetBall() { 
+  // IMPLEMENT ME
   Serial.println("reset ball");
 }
 
-void moveBarDown() { // TODO: should make the bar go down by a decided amount
-  // if it's alr at the bottom, don't move it
+void moveBarDown() {
+  long barPosR = motorR.currentPosition();
+  long barPosL = motorL.currentPosition(); 
+  lastBarTime = millis();
+  if (barPosR-STEPS_PER_CALL > FLOOR) {
+      motorR.moveTo(barPosR-STEPS_PER_CALL);
+  }
+
+  if (barPosL-STEPS_PER_CALL > FLOOR) {
+       motorL.moveTo(barPosL-STEPS_PER_CALL);
+  }
 }

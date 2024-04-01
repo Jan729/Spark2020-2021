@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <Stepper.h>
+#include <AccelStepper.h>
 #include "RunningAverage.h"
 #include "SevSeg.h"
 #include "Wire.h"
@@ -18,17 +18,20 @@
 #define NUMTARGETS 30
 #define IROFFSET 25
 #define STARTBUTTONPIN 2
-#define JOYSTICK_R_UP 3
-#define JOYSTICK_R_DOWN 4
-#define JOYSTICK_L_UP 5
-#define JOYSTICK_L_DOWN 6
 
-#define MOTOR_R_STEP 7
-#define MOTOR_R_DIR  8
-#define MOTOR_L_STEP 9
-#define MOTOR_L_DIR  10
-#define RESET_MOTOR_STEP 11
-#define RESET_MOTOR_DIR 12
+#define STEP_L 3
+#define DIR_L 4
+#define STEP_R 5
+#define DIR_R 6
+
+#define JOYSTICK_L_UP 7
+#define JOYSTICK_L_DOWN 8
+#define JOYSTICK_R_UP 9
+#define JOYSTICK_R_DOWN 10
+
+// TODO ball return stepper pins
+// #define RESET_MOTOR_STEP 11
+// #define RESET_MOTOR_DIR 12
 
 // fixme give these a better name
 #define SPARK_PCB_1 24
@@ -53,16 +56,18 @@
 
 extern int BUILTIN_LED; // connect Led to arduino pin 13
 
-#define STEPS_PER_REV 200 //DRV driver
-#define CEILING 0                //highest height of bar
-#define FLOOR 299             //bottom of the playing area, not actually the floor
-#define BALL_RETURN_HEIGHT 388 //lowest height of bar, where bar will pick up ball
-#define MAX_BAR_TILT 38         //maximum vertical slope of bar, aka barPosRight - barPosLeft
-#define MAX_SPEED 200 //in rpm
-#define STEP_INCR 800 //steps taken on each loop() iteration
-#define STEPS_30_DEG 67
-#define BALL_RETURN_DELAY_MS 2000 //time to wait until a new ball has rolled onto bar
-#define BAR_DOWN_DELAY_S 5 //TODO: calibrate for continuosly moving bar down
+// bar motors constants
+#define CEILING 776000           //steps to reach top of playing area
+#define FLOOR 17800             //revs to reach bottom of the playing area
+#define BALL_RETURN_HEIGHT 0 //lowest height of bar, where bar will pick up ball
+#define MAX_BAR_TILT 7600      // maximum slope of bar, aka barPosLeft - barPosRight
+#define MAX_STEPS_PER_SEC 4000
+#define INITIAL_STEPS_PER_SEC 2000
+#define MAX_STEPS_PER_S_SQUARED 3000
+#define STEPS_PER_CALL 500 // 1000 steps = 1cm in height
+#define STEPS_PER_REV 200
+#define LOOK_AHEAD_STEPS 100
+#define BAR_DOWN_DELAY_S 5
 
 // FOR WOKWI TESTING ONLY:
 #define LOSE_GAME_BUTTON 14
@@ -106,25 +111,23 @@ extern TM1637Display bonusScoreDisplay;
 extern TM1637Display curScoreDisplay;
 extern TM1637Display highScoreDisplay;
 
-//global vars for pins for input buttons 
-extern int leftBarInput;
-extern int rightBarInput;
+
 
 //global variables for timing 
 extern unsigned long finishTime;  //time when the ball drops into target hole, resets each round
 extern unsigned long idleTime;
 extern volatile long debounce_time;
 extern volatile long current_button_time;
+extern unsigned long lastBarTime;
 
-//global vars for bar movement
+//global vars for pins for bar movement
 extern int leftBarInput;
 extern int rightBarInput;
-extern int barPosL;
-extern int barPosR;
 extern int barTilt;
-extern Stepper motorR;
-extern Stepper motorL;
-extern int stepsPerRevolution;
-extern Stepper motorBallReturn; 
+extern unsigned long lastBarTime;
+extern AccelStepper motorR;
+extern AccelStepper motorL;
+
+
 
 /************END OF GLOBAL DEFINITIONS**********************/

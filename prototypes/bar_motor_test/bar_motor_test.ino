@@ -39,8 +39,6 @@ Guess: 76mm = 38 rev max height difference between L and R ends of bar
 
 int leftBarInput;
 int rightBarInput;
-int prevSpeedLeft;
-int prevSpeedRight;
 int barTilt = 0;
 unsigned long lastBarTime;
 AccelStepper motorR = AccelStepper(AccelStepper::DRIVER, STEP_R, DIR_R);

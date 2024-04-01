@@ -1,12 +1,12 @@
 #include "global-variables.h"
 #include "functions.h"
-#include <Stepper.h>
 #include "RunningAverage.h"
 #include "SevSeg.h"
 #include "Wire.h"
 #include <Wire.h>
 #include <Adafruit_MCP23X17.h>
 #include <avr/interrupt.h>
+#include <AccelStepper.h>
 
 /************LOCAL VARIABLE DECLARATIONS **********************/
 // To make a variable global, add it to
@@ -42,21 +42,18 @@ int highScore;
 
 //global variables for timing 
 unsigned long finishTime;  //time when the ball drops into target hole, resets each round
-unsigned long lastBarTime;
 volatile long debounce_time;
 volatile long current_button_time;
 
 //global vars for bar movement
-int leftBarInput; // -1 = down, 0 = stationary, 1 = up
+int leftBarInput;
 int rightBarInput;
-int barPosL;
-int barPosR;
 int barTilt;
-unsigned int barDownDelay;
-Stepper motorR = Stepper(STEPS_PER_REV, MOTOR_R_STEP, MOTOR_R_DIR);
-Stepper motorL = Stepper(STEPS_PER_REV, MOTOR_L_STEP, MOTOR_L_DIR);
-int stepsPerRevolution;
-Stepper motorBallReturn = Stepper(STEPS_PER_REV, RESET_MOTOR_STEP, RESET_MOTOR_DIR); 
+unsigned long lastBarTime;
+AccelStepper motorR = AccelStepper(AccelStepper::DRIVER, STEP_R, DIR_R);
+AccelStepper motorL = AccelStepper(AccelStepper::DRIVER, STEP_L, DIR_L);
+
+// TODO Stepper motorBallReturn = Stepper(STEPS_PER_REV, RESET_MOTOR_STEP, RESET_MOTOR_DIR); 
 
 SevSeg sevseg1;
 SevSeg sevseg2;
@@ -91,11 +88,7 @@ void resetAllVariables() {
   //global vars for bar movement
   leftBarInput = 0;
   rightBarInput = 0;
-  barPosL = FLOOR;
-  barPosR = FLOOR;
   barTilt = 0;
-  stepsPerRevolution = 800;
-  barDownDelay = 50000; //TODO calibrate delay here for bar to go down (e.g. every 5 secs)
 
   //global variables for timing 
   finishTime = 0;  //time when the ball drops into target hole, resets each round
@@ -126,8 +119,7 @@ void resetGame(){
 bool checkPassingTime(){
   unsigned long currentTime = millis();
   unsigned long passingTime = currentTime  - lastBarTime;
-  if (passingTime/1000 > BAR_DOWN_DELAY_S) // 5 seconds of idle 
-    return true;
+  return passingTime/1000 > BAR_DOWN_DELAY_S;
 }
 
 //ISR for start/stop game button only to change gameState
@@ -176,13 +168,6 @@ void setup() {
 
   // set up hex displays
   setHexDisplayBrightness();
-  
-  //reset stepper motors
-  barPosL = FLOOR;
-  barPosR = FLOOR;
-  motorBallReturn.setSpeed(MAX_SPEED); //setSpeed only take a positive number
-  motorR.setSpeed(MAX_SPEED);
-  motorL.setSpeed(MAX_SPEED);
 }
 
 void loop() {
@@ -194,9 +179,10 @@ void loop() {
     //TODO: Work out where to call start and end times (NOT DONE)
     // finishTime = millis(); //might not need here depending on when incrementLevel is called. 
     
-    pollBarJoysticks(); 
     moveBar();
+
     pollIRSensors(); // newTarget, winGame, loseGame is decided here. score is updated here too
+    
     if (checkPassingTime()) {
       lastBarTime = millis();
       moveBarDown();
