@@ -5,8 +5,16 @@
 1. [Intended Gameplay](#intended-gameplay)
 2. [Build Tips](#build-tips)
 3. [Build Schematics and Tutorials](#build-schematics-and-tutorials)
+    - [TODO Power Supply and Pin Count](#todo-power-supply-and-pin-count)
+    - [IR Sensors](#ir-sensors)
+    - [Motors and Motor Drivers](#motors-and-motor-drivers)
+    - [Joysticks](#joysticks)
+    - [LEDs](#leds)
+    - [Hex Displays](#hex-displays)
+    - [Start/Reset Button](#startreset-button)
 4. [How to Simulate this Project](#how-to-simulate-this-project)
 5. [How to Run the Code on a Real Arduino Mega](#how-to-run-the-code-on-a-real-arduino-mega)
+
 
 ## Intended Gameplay
 
@@ -36,24 +44,28 @@ Press the Start button at any time to reset the game to level 1.
 
 ## Build Schematics and Tutorials
 
-### Backboard Wiring
+### I/O Diagram
+
+[Click here to view I/O diagram](https://drive.google.com/file/d/1cqpRm-2tPJbcKSMdjFogfon1K79lBqss/view?usp=sharing)
+
+### I/O Wiring Explanation
 
 Walk to the back of the display and face the wires on the backboard. Hole numbers are written in pencil on the backboard wood. The LEFT side contains (1) the LED VCC wires, (2) the IR receiver DATA wires, (3) the IR emitter VCC wires. Some wires that belong to the same node, like the LED VCC wires, are merged together to save wire. The RIGHT side is common ground.
 
-### TODO Power Supply
+#### TODO Power Supply and Pin Count
 
 The computer power supply (the grey box) is for testing only and does not meet fire safety standards for long-term use. You will need to replace this power supply with the new power supply to the arduino, PCBs, and motor drivers. There is a new 12V power supply reserved for Remy's in the spark garage. Janelle is not sure where the regulator is.
 
 12V goes to the arduino and motors, 3V or 5V goes to everything else depending on the component. For subsystems that cost more than a few dollars or a few minutes of labour to replace, Janelle recommends splicing a fuse with appropriate current rating into the wire between the regulator and the subsystem's VCC. For example, if the datasheet says the circuit will fry at >1A, pick a 1A fuse.
 
-#### Power supply requirements
+##### Power supply requirements
 Class 2 fused 12V power supply. Keep it outside of the display, away from flammable materials. See diagram, where `<--->` are wires.
 ```
 Wall outlet <---------> power supply with exposed 12V port <---> 12V to 3V regulator <---> Remy’s build
 ```
 
 
-#### Overall Arduino Mega Pin Count
+##### Overall Arduino Mega Pin Count
 - Motors – Assuming stepper motor for ball return, 6 digital driver pins (step and dir x3 drivers, right bar, left bar, ball return)
 - IR Sensors – 1 analog, 6 digital (for muxes)
 - LEDs + Shift Register Select – 3 digital
@@ -64,7 +76,7 @@ Wall outlet <---------> power supply with exposed 12V port <---> 12V to 3V regul
 
 TOTAL PINS: 6 + 7 + 3 + 1 + 2 + 2 + 4 = 25
 
-### IR sensors
+#### IR sensors
 
 Below link is viewable by Spark 2020-2021 exec team:
 
@@ -75,11 +87,11 @@ The mux chip is CD4051B. If you want to simulate it in wokwi, copy the custom ch
 [CD4051B Demo](https://wokwi.com/projects/343522915673702994)
 
 
-### Motors and motor drivers
+#### Motors and motor drivers
 
 There are three motors, one to control the left side of the bar, one to control the right side of the bar, and one to operate the cam mechanism that returns the ball to the bar after the ball falls through a hole.
 
-#### Bar motors and drivers
+##### Bar motors and drivers
 
 The bar can move straight up if you hold both joysticks in the 'up' position, and vice versa for down. If the bar is at an angle, the code will prevent the bar from tilting too much to prevent the bar from breaking.
 
@@ -87,7 +99,7 @@ The bar can move straight up if you hold both joysticks in the 'up' position, an
 
 [Motor Driver TB6600 datasheet](https://bulkman3d.com/wp-content/uploads/2019/06/TB6600-Stepper-Motor-Driver-BM3D-v1.1.pdf)
 
-##### Wiring
+###### Wiring
 
 1) Small wire to short DIR- and PUL- together
 2) DIR+ green wire goes to arduino DIR_L or DIR_R pin specified in code
@@ -104,31 +116,31 @@ The lead screws are lubricated. Don't touch them. Myfab has extra lubricant if y
 
 Tip: If you notice a terrible squealing noise after modifying the code, the bar mechanism squeals when the motor is accelerating or decelerating at a *very* slow rate (ie 1 RPM, just before the motor stops to change spin direction). Increase the total acceleration in your code to prevent the AccelStepper library from holding the motor at a low acceleration for more than a fraction of a second. Lubrication does NOT affect the squealing.
 
-##### TODO
+###### TODO
 
 The bar should lower itself by a few cm automatically if nobody has touched the controls in the last few seconds. When the next person arrives to play the game, the bar is already at the bottom and they can begin playing a little sooner. It also incentivizes the player to keep playing instead of standing idle.
 
-#### Ball return motor
+##### Ball return motor
 
-##### TODO
+###### TODO
 
 As of early 2024, the ball return motor depends on the final mechanical design of the ball return mechanism. Please update this section once the motor is chosen (ie servo, stepper, or DC).
 
-### Joysticks
+#### Joysticks
 
 The two joysticks control the right and left sides of the bar, respectively. The joysticks can move the bar up or down. To prevent the bar from breaking, the joystick code will automatically stop the bar from moving if one side of the bar is too high. The sideways joystick movement does not do anything.
 
-#### Joystick Wiring
+##### Joystick Wiring
 
 Each joystick direction has a switch connected to a pair of wires. When the joystick moves, the joystick closes the switch, connecting the pair of wires together. We are using an active low setup for both up and down switches. Active low means one wire is connected to ground, and the other goes to the arduino to read for a `LOW` signal. 
 
-### Leds
+#### Leds
 
-#### LED Wiring
+##### LED Wiring
 
 LEDs are connected to the "SPARK" PCB. This PCB has 4 shift registers with 8 output pins each. We have 30 LEDs. Reece designed the PCB, he may be able to answer questions about the design.
 
-### Hex displays
+#### Hex displays
 
 There are two hex displays: current player score and all-time high score.
 
@@ -138,17 +150,17 @@ These tutorials may help you wire the hex displays:
 
 [Display de 7 Segmentos TM1637 (the best wokwi one I found, but it's in spanish)](https://wokwi.com/projects/378335118444269569)
 
-#### Hex display scoring system
+##### Hex display scoring system
 
 1) Starting from 100 bonus points, for each level, the max bonus increments by 10 points, and drops by 10 incrementally, every 3 seconds
 2) At the end of each round, the level bonus is added to the current score
 3) At the end of each round, the current score is compared with the highest score such that if the top score has been exceeded, the current player’s score will replace the historic top score
 
-##### TODO
+###### TODO
 
 The all-time high score should be stored in non-volatile memory to prevent loss when unplugging the display.
 
-### Start/Reset button
+#### Start/Reset button
 
 This button controls the flow of the game. Pressing it while the game is "idle" triggers the variables to reset and begin level 1. Pressing the button during the game play will trigger an interrupt that will reset the game back to level 1. The bar should move such that it will dump any ball remaining on the bar into the backboard. Then the ball return mechanism should return a new ball onto the bar.
 
