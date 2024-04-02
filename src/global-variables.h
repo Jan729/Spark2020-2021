@@ -40,10 +40,12 @@
 #define SPARK_PCB_3 28
 
 #define BAR_SENSOR_PIN 30 // todo: add sensor to calibrate bar position when display powered on
-#define HEX_PLAYER_CLK 32
-#define HEX_PLAYER_DIO 34
-#define HEX_HIGHSCORE_CLK 36
-#define HEX_HIGHSCORE_DIO 38
+#define HEX_CUR_SCORE_CLK 32
+#define HEX_CUR_SCORE_DIO 34
+#define HEX_BONUS_CLK 36
+#define HEX_BONUS_DIO 38
+#define HEX_HIGHSCORE_CLK 40
+#define HEX_HIGHSCORE_DIO 42
 
 // place the mux pins along the same row on the mega, next to the analog pins
 // fixme give these a better name

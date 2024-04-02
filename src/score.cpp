@@ -8,19 +8,10 @@
 // https://github.com/avishorp/TM1637
 // CLK and DIO pins need to be connected to Arduino
 
-// pin declarations just for reference – to be removed?
-#define bonusScoreCLK 2
-#define curScoreCLK 3
-#define curScoreDIO 4
-
-#define bonusScoreDIO 5
-#define highScoreCLK 6
-#define highScoreDIO 7
-
 // create new instance of the TM1637Display class by passing clk and dio pin values to it
-TM1637Display bonusScoreDisplay(bonusScoreCLK, bonusScoreDIO);
-TM1637Display curScoreDisplay(curScoreCLK, curScoreDIO);
-TM1637Display highScoreDisplay(highScoreCLK, highScoreDIO);
+TM1637Display bonusScoreDisplay(HEX_BONUS_CLK, HEX_BONUS_DIO);
+TM1637Display curScoreDisplay(HEX_CUR_SCORE_CLK, HEX_CUR_SCORE_DIO);
+TM1637Display highScoreDisplay(HEX_HIGHSCORE_CLK, HEX_HIGHSCORE_DIO);
 
 void setHexDisplayBrightness() {
   bonusScoreDisplay.setBrightness(7); // brightness level from 0 (lowest) to 7 (highest)
