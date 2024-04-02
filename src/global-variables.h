@@ -50,12 +50,12 @@
 // place the mux pins along the same row on the mega, next to the analog pins
 // fixme give these a better name
 #define MUX_DATA A15
-#define MUX_SELECT_1 46
-#define MUX_SELECT_2 48
-#define MUX_SELECT_3 50
-#define MUX_SELECT_A 47
-#define MUX_SELECT_B 49
-#define MUX_SELECT_C 51
+#define MUX_SELECT_A1 46
+#define MUX_SELECT_B1 48
+#define MUX_SELECT_C1 50
+#define MUX_SELECT_A2 47
+#define MUX_SELECT_B2 49
+#define MUX_SELECT_C2 51
 
 extern int BUILTIN_LED; // connect Led to arduino pin 13
 
