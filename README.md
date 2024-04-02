@@ -66,8 +66,14 @@ TOTAL PINS: 6 + 7 + 3 + 1 + 2 + 2 + 4 = 25
 
 ### IR sensors
 
-Below link is viewable by Spark 2020-2021 exec team.
+Below link is viewable by Spark 2020-2021 exec team:
+
 [IR Sensor–Mux Circuit Documentation by Ginny](https://docs.google.com/document/d/12kzbL69qe4iZLc2-gt9O6dBEr0O6Me1dWEzLK4bp4YY/edit?usp=sharing)
+
+The mux chip is CD4051B. If you want to simulate it in wokwi, copy the custom chip implementation from this demo:
+
+[CD4051B Demo](https://wokwi.com/projects/343522915673702994)
+
 
 ### Motors and motor drivers
 

@@ -39,7 +39,7 @@
 #define SPARK_PCB_2 26
 #define SPARK_PCB_3 28
 
-#define BAR_SENSOR_PIN 30 // todo: add sensor to calibrate bar position when display powered on
+#define BAR_SENSOR_PIN 30 // TODO: add sensor to calibrate bar position when display powered on? or store bar position in non-volatile memory?
 #define HEX_CUR_SCORE_CLK 32
 #define HEX_CUR_SCORE_DIO 34
 #define HEX_BONUS_CLK 36
