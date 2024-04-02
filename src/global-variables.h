@@ -12,11 +12,12 @@
 /**********CONSTANTS*****************************/
 #define IS_WOKWI_TEST true
 
-#define BOTTOMPIN 44 // FIXME this pin is for the sensor at the bottom of the backboard ramp
-                     // add this IR sensor to the mux circuit
+#define BOTTOMPIN 44 // FIXME this sensor at the bottom of the backboard ramp
+                     // has not been built
 #define SCOREINCREASE 10
 #define NUMTARGETS 30
 #define IROFFSET 25
+
 #define STARTBUTTONPIN 2
 
 #define STEP_L 3
@@ -55,6 +56,9 @@
 #define MUX_SELECT_C 51
 
 extern int BUILTIN_LED; // connect Led to arduino pin 13
+
+// start/reset button constants
+#define DEBOUNCE_DELAY_MS 100
 
 // bar motors constants
 #define CEILING 776000           //steps to reach top of playing area

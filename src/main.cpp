@@ -69,7 +69,6 @@ bool ballAtBottomState = false;
 /****** GAME CONTROL FUNCTIONS ****/
 
 void resetAllVariables() {
-  playingGame = true; //true if someone is playing, false if game over
   winGame = false; 
   loseGame = false;
   bonusScore = 0;
@@ -99,12 +98,10 @@ void resetAllVariables() {
 }
 
 void waitToStartGame() { 
-    // TODO: add turning off joysticks, LED, IR transceiver
-    Serial.println("waitng for someone to start game");
+    Serial.println("waiting for someone to start game");
     while(!playingGame) {
       // do nothing until interrupt changes the state
     }
-
 }
 
 void resetGame(){
@@ -123,17 +120,25 @@ bool checkPassingTime(){
 }
 
 //ISR for start/stop game button only to change gameState
-void buttonPressed() {
-  if (playingGame == true) {
+void startButtonPressed() {
+  static unsigned long lastDebounceTime = 0;
+  bool debounceElapsed = millis() - lastDebounceTime >= DEBOUNCE_DELAY_MS;
+  
+  if (!debounceElapsed) {
+    return;
+  }
+  
+  lastDebounceTime = millis();
+
+  #if IS_WOKWI_TEST
+  if (playingGame) {
     Serial.println("Button to end game is pressed");
-    playingGame = false;
-    delayMicroseconds(100000); //non-blocking delay to debounce button
-  }
-  else if(playingGame == false) {
+  } else {
     Serial.println("Button to start game is pressed");
-    playingGame = true;
-    delayMicroseconds(100000); //non-blocking delay to debounce button
   }
+  #endif
+  
+  playingGame = !playingGame;
 }
 
 /****** END OF GAME CONTROL FUNCTIONS ****/
@@ -155,7 +160,7 @@ void setup() {
   
   //button interrupt
   pinMode(STARTBUTTONPIN, INPUT_PULLUP);  //Start button, LOW when pressed
-  attachInterrupt(digitalPinToInterrupt(STARTBUTTONPIN), buttonPressed, FALLING);
+  attachInterrupt(digitalPinToInterrupt(STARTBUTTONPIN), startButtonPressed, FALLING);
 
   // Game Input Buttons to Move Bar 
   pinMode(JOYSTICK_R_UP, INPUT_PULLUP);
