@@ -1,6 +1,13 @@
 ~~Ice Cold Beer~~ 
 # Remy's Quest :mouse: :cheese:
 
+## Table of Contents
+1. [Intended Gameplay](#intended-gameplay)
+2. [Build Tips](#build-tips)
+3. [Build Schematics and Tutorials](#build-schematics-and-tutorials)
+4. [How to Simulate this Project](#how-to-simulate-this-project)
+5. [How to Run the Code on a Real Arduino Mega](#how-to-run-the-code-on-a-real-arduino-mega)
+
 ## Intended Gameplay
 
 Press the Start button to start the game.
@@ -33,7 +40,7 @@ Press the Start button at any time to reset the game to level 1.
 
 Walk to the back of the display and face the wires on the backboard. Hole numbers are written in pencil on the backboard wood. The LEFT side contains (1) the LED VCC wires, (2) the IR receiver DATA wires, (3) the IR emitter VCC wires. Some wires that belong to the same node, like the LED VCC wires, are merged together to save wire. The RIGHT side is common ground.
 
-### WIP Power Supply
+### TODO Power Supply
 
 The computer power supply (the grey box) is for testing only and does not meet fire safety standards for long-term use. You will need to replace this power supply with the new power supply to the arduino, PCBs, and motor drivers. There is a new 12V power supply reserved for Remy's in the spark garage. Janelle is not sure where the regulator is.
 
@@ -91,13 +98,13 @@ The lead screws are lubricated. Don't touch them. Myfab has extra lubricant if y
 
 Tip: If you notice a terrible squealing noise after modifying the code, the bar mechanism squeals when the motor is accelerating or decelerating at a *very* slow rate (ie 1 RPM, just before the motor stops to change spin direction). Increase the total acceleration in your code to prevent the AccelStepper library from holding the motor at a low acceleration for more than a fraction of a second. Lubrication does NOT affect the squealing.
 
-##### WIP
+##### TODO
 
 The bar should lower itself by a few cm automatically if nobody has touched the controls in the last few seconds. When the next person arrives to play the game, the bar is already at the bottom and they can begin playing a little sooner. It also incentivizes the player to keep playing instead of standing idle.
 
 #### Ball return motor
 
-##### WIP
+##### TODO
 
 As of early 2024, the ball return motor depends on the final mechanical design of the ball return mechanism. Please update this section once the motor is chosen (ie servo, stepper, or DC).
 
@@ -131,7 +138,7 @@ These tutorials may help you wire the hex displays:
 2) At the end of each round, the level bonus is added to the current score
 3) At the end of each round, the current score is compared with the highest score such that if the top score has been exceeded, the current player’s score will replace the historic top score
 
-##### WIP
+##### TODO
 
 The all-time high score should be stored in non-volatile memory to prevent loss when unplugging the display.
 
@@ -141,7 +148,7 @@ This button controls the flow of the game. Pressing it while the game is "idle" 
 
 [Start button flow diagram as of 2023](https://mermaid.live/edit#pako:eNptkU1zgjAQhv_KupfSGbQIAi2HOipqvXXG9tLSQ4T1Y4TECWFaqvz3RrAdmWkOmey-b57dbI4Yi4QwwHUqPuMtkwpewoiDXiNjkaQEmdZvodt9hFPnkLJyxzdzltEJRhdbo7Wk8ftSadSdpJwUrJg09ZamJrwuTMhjIckEtctIfjSMcc2YGM8NBDaa0hRu9Mk_NSYtqd1aaEx58ke5QMLaOT0-sRzUluqOQJIqJKdkWDWmaYNbEcvGUuyJn2B2PYeWq3NtmxszIeMLVglgvIStSGkIoeA3Cn5noVVOX6p-__DS2rzmzSJ-DtFEPZmM7RL9LcdzJkLdb0YRBvqYMLmPMOKV9rFCiWXJYwyULMjE4pAwReGObSTLMFizNNfZA-NvQrRiDI74hUHXth2r1x-4ju0NPN-yfM_EEgPf8nqO7_iufW97dt91KhO_a4TVe_DtgTXo65uu7VlWv_oBVUWv-Q)
 
-## How to simulate this project
+## How to Simulate this Project
 See [Getting Started with Wokwi for VS Code](https://docs.google.com/document/d/1XQ6oEajXWh64AKem3sj6RQL7GPWH-MVa7xeWXK2pB6A/edit#heading=h.9a71xmgofye9) for a detailed guide.
 
 TL;DR version:
@@ -177,3 +184,15 @@ To add another file with helper functions:
 4. Click on your desired search result
 5. Click "Add to Project" > "Select Project" > "Spark2020-2021"
 6. The new library should be listed in the `platformio.ini` file
+
+## How to Run the Code on a Real Arduino Mega
+
+1. Go to `global-variables.h` and change the directive `IS_WOKWI_TEST` to `false`:
+
+```
+#define IS_WOKWI_TEST false
+```
+
+2. Click the checkmark (PlatformIO: Build) and the arrow (PlatformIO: Upload) icons to upload the code to an arduino. The arduino will remember the code even if you disconnect the power
+
+3. If you need to run the setup() again, press the little rubber button on the arduino. The arduino will stop whatever it was doing and run the setup() then loop() again.
