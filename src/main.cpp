@@ -68,7 +68,7 @@ bool ballAtBottomState = false;
 
 /****** GAME CONTROL FUNCTIONS ****/
 
-void resetAllVariables() {
+void resetGameVariables() {
   winGame = false; 
   loseGame = false;
   bonusScore = 0;
@@ -77,8 +77,6 @@ void resetAllVariables() {
   level = 1;
 
   // control next level and game over conditions
-  targetLEDPin = 0;
-  targetSensorPin = 0;
   targetBroken = false;
   bottomBroken = false;
   wonLevelState = false;
@@ -94,7 +92,6 @@ void resetAllVariables() {
   lastBarTime = millis();
   debounce_time = 0;
   current_button_time = 0;
-  
 }
 
 void waitToStartGame() { 
@@ -105,14 +102,10 @@ void waitToStartGame() {
 }
 
 void resetGame(){
-  calibrateBarPosition();
-  
-  resetAllVariables();
-  resetBarAndBall();
-
+  resetGameVariables();
   resetScores();
-  digitalWrite(targetLEDPin, HIGH);
-
+  calibrateBarPosition();
+  resetBarAndBall();
 }
 
 bool playerIsIdle(){
@@ -203,17 +196,15 @@ void loop() {
   if (winGame) {
     Serial.println("You win");
     digitalWrite(targetLEDPin, LOW); 
-    // flashAllTargetLEDs(); //TODO: change to new code with LED array
-    // displayWinMessage();
+    // flashAllTargetLEDs(); //TODO: does this function still work?
+    displayWinMessage();
   } else if (loseGame){
     Serial.println("You lose");
     digitalWrite(targetLEDPin, LOW); 
-    // displayLoseMessage();
+    displayLoseMessage();
   } else {
     Serial.println("You were idle or you reset the game");
     // flashAllTargetLEDs();
-    // displayLoseMessage();
-    // TODO: edge case when it is idle: force ball to any hole? or don't reset ball next time?
   }
 
 }
