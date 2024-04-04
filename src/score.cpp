@@ -36,16 +36,17 @@ void updateScore(int curScore, int bonusScore, int highScore) { // after every r
 }
 
 void displayScore(TM1637Display display, int score) {
-  curScoreDisplay.clear();                     // clear previous value
+  display.clear();                     // clear previous value
   delay(500);                                  // delay to make score update more obvious to player
-  curScoreDisplay.showNumberDec(score, false); // display new score <- need to test this
+  display.showNumberDec(score, false); // display new score <- need to test this
 }
 
 void resetScores() {
-  bonusScoreDisplay.clear();
-  curScoreDisplay.clear();
+  displayScore(curScoreDisplay, 0);
+  displayScore(bonusScoreDisplay, 0);
 }
 
+// TODO: store in non volatile memory. retrieve on setup()
 void sethighScore(int curScore, int highScore) {
   if (curScore > highScore) {      // if high score is updated, blink new high score 3 times
     highScore = curScore;
