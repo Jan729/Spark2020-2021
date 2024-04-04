@@ -19,46 +19,48 @@ void setHexDisplayBrightness() {
   highScoreDisplay.setBrightness(7);
 }
 
-void displayBonus(int bonusScore, int targetDifficulty, int finishTime) { // calculate bonus score base on level and time, display onto hex display
-  // starting from 100, the max bonus points increments by 100 for each level
-  // every 3 seconds, the bonus points decreases by 10, until 0 is reached
-  
-  if (finishTime % 3 == 0){
-    bonusScore -= 10;
-  } 
+void updateBonus(unsigned long timeNow) {
+  if (timeNow - lastBonusUpdateTime < BONUS_DECREASE_INTERVAL_MS) {
+    return;
+  }
+
+  bonusScore -= SCOREINCREASE;
+  if (bonusScore < 0) {
+    bonusScore = 0;
+  }
+  lastBonusUpdateTime = timeNow;
   displayScore(bonusScoreDisplay, bonusScore);
 }
 
-void updateScore(int curScore, int bonusScore, int highScore) { // after every round, update current score with bonus score
+void updateScore() { // after every round, update current score with bonus score
   curScore += bonusScore;
   displayScore(curScoreDisplay, curScore);
   sethighScore(curScore, highScore); // check if high score has been surpassed
 }
 
 void displayScore(TM1637Display display, int score) {
-  display.clear();                     // clear previous value
-  delay(500);                                  // delay to make score update more obvious to player
-  display.showNumberDec(score, false); // display new score <- need to test this
+  display.showNumberDec(score, false);
 }
 
-void resetScores() {
-  displayScore(curScoreDisplay, 0);
-  displayScore(bonusScoreDisplay, 0);
+void retrieveHighScore() {
+  // TODO:  retrieve high score from non volatile memory
 }
-
-// TODO: store in non volatile memory. retrieve on setup()
 void sethighScore(int curScore, int highScore) {
   if (curScore > highScore) {      // if high score is updated, blink new high score 3 times
     highScore = curScore;
     highScoreDisplay.clear();
-    delay(500);
+    delay(250);
     highScoreDisplay.showNumberDec(highScore, false);
+    delay(500);
     highScoreDisplay.clear();
-    delay(500);
+    delay(250);
     highScoreDisplay.showNumberDec(highScore, false);
+    delay(500);
     highScoreDisplay.clear();
-    delay(500);
+    delay(250);
     highScoreDisplay.showNumberDec(highScore, false);
+
+    // TODO: store highscore in non volatile memory 
   }
 }
 
@@ -69,17 +71,32 @@ void displayLoseMessage() { // display "OOPS" if game is lost
 		 SEG_A | SEG_B | SEG_E | SEG_F | SEG_G,          // P
 		 SEG_A | SEG_C | SEG_D | SEG_F | SEG_G           // S
 		};
+
+    bonusScoreDisplay.setSegments(oops);
     curScoreDisplay.clear();
-    curScoreDisplay.setSegments(oops);
+    delay(250);
+    displayScore(curScoreDisplay, curScore);
+    bonusScoreDisplay.clear();
+    delay(500);
+    bonusScoreDisplay.setSegments(oops);
+    delay(500);
+    displayScore(curScoreDisplay, curScore);
 }
 
 void displayWinMessage() { // display "WIN" if game is won... a little sketchy but best i can do
     uint8_t win[] = {
-		 SEG_C | SEG_D | SEG_E | SEG_F,         // W first half
-		 SEG_B | SEG_C | SEG_D | SEG_E,         // W second half
-		 SEG_B | SEG_C | SEG_E | SEG_F,        // I + N first half
-		 SEG_B | SEG_C | SEG_D | SEG_E | SEG_F  // N second half
-		};
+    SEG_C | SEG_D | SEG_E | SEG_F, // w first half
+    SEG_B | SEG_C | SEG_D | SEG_E, // w second half
+    SEG_B | SEG_C, // "I"
+    SEG_A | SEG_B | SEG_C | SEG_E | SEG_F // "n"
+    };
+    bonusScoreDisplay.setSegments(win);
     curScoreDisplay.clear();
-    curScoreDisplay.setSegments(win);
+    delay(250);
+    displayScore(curScoreDisplay, curScore);
+    bonusScoreDisplay.clear();
+    delay(500);
+    bonusScoreDisplay.setSegments(win);
+    delay(500);
+    displayScore(curScoreDisplay, curScore);
 }

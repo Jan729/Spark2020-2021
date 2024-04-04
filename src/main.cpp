@@ -28,7 +28,6 @@ int targetHoles[NUMTARGETS]; // stores pin numbers of target LEDs to light up
 
 bool winGame; 
 bool loseGame;
-int targetDifficulty;
 int level;
 int targetLEDPin;
 int targetSensorPin;
@@ -41,9 +40,9 @@ int curScore;
 int highScore;
 
 //global variables for timing 
+unsigned long startLevelTime;
 unsigned long finishTime;  //time when the ball drops into target hole, resets each round
-volatile long debounce_time;
-volatile long current_button_time;
+unsigned long lastBonusUpdateTime;
 
 //global vars for bar movement
 int leftBarInput;
@@ -68,30 +67,36 @@ bool ballAtBottomState = false;
 
 /****** GAME CONTROL FUNCTIONS ****/
 
-void resetGameVariables() {
-  winGame = false; 
-  loseGame = false;
-  bonusScore = 0;
-  curScore = 0;
-  targetDifficulty = 0; //TODO: what's the difference between targetDifficulty and level?
-  level = 1;
+void setupNextLevel() {
+  finishTime = millis();
 
-  // control next level and game over conditions
+  updateScore();
+  bonusScoreDisplay.clear();
+
+  level++;
+
+  if(level > NUMTARGETS) {
+    playingGame = false;
+    winGame = true; //win the game
+  }
+
   targetBroken = false;
   bottomBroken = false;
   wonLevelState = false;
   ballAtBottomState = false;
 
-  //global vars for bar movement
-  leftBarInput = 0;
-  rightBarInput = 0;
-  barTilt = 0;
+  int oldTarget = targetLEDPin;
+  targetLEDPin++; // TODO select next target LED from spark PCB
+  targetSensorPin++; // TODO select next IR sensor with mux
 
-  //global variables for timing 
-  finishTime = 0;  //time when the ball drops into target hole, resets each round
+  resetBarAndBall();
+  updateLights(oldTarget, targetLEDPin); //TODO: update
   lastBarTime = millis();
-  debounce_time = 0;
-  current_button_time = 0;
+
+  startLevelTime = millis();
+  lastBonusUpdateTime = startLevelTime;
+  bonusScore = level*100;
+  displayScore(bonusScoreDisplay, bonusScore);
 }
 
 void waitToStartGame() { 
@@ -101,20 +106,25 @@ void waitToStartGame() {
     }
 }
 
-void resetGame(){
-  resetGameVariables();
-  resetScores();
+void resetGame() {
+  winGame = false; 
+  loseGame = false;
+  curScore = 0;
+  level = 0;
+  retrieveHighScore();
+
   calibrateBarPosition();
-  resetBarAndBall();
+
+  setupNextLevel();
 }
 
-bool playerIsIdle(){
+bool playerIsIdle() {
   unsigned long currentTime = millis();
   unsigned long joysticksIdleMs = currentTime  - lastBarTime;
   return joysticksIdleMs/1000 > BAR_DOWN_DELAY_S;
 }
 
-//ISR for start/stop game button only to change gameState
+//ISR for start/stop game button only to change game state
 void startButtonPressed() {
   static unsigned long lastDebounceTime = 0;
   bool debounceElapsed = millis() - lastDebounceTime >= DEBOUNCE_DELAY_MS;
@@ -183,8 +193,20 @@ void loop() {
     
     moveBar();
 
-    pollIRSensors(); // newTarget, winGame, loseGame is decided here. score is updated here too
-    
+    pollIRSensors();
+        
+    updateBonus(millis());
+
+    if (targetBroken) { //ball fell in good hole
+      Serial.println((String)"Won level " + level);
+      setupNextLevel();
+      
+    } else if (bottomBroken) { //ball fell into the bottom of the backboard without passing through target 
+      playingGame = false;
+      loseGame = true;
+
+    }
+
     if (playerIsIdle()) {
       lastBarTime = millis();
       moveBarDown();

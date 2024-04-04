@@ -8,6 +8,8 @@
 void calibrateBarPosition() {
   long hardcodedStartPosR = FLOOR;
   long hardcodedStartPosL = FLOOR;
+  barTilt = hardcodedStartPosL - hardcodedStartPosR;
+  
   motorR.setCurrentPosition(hardcodedStartPosR);
   motorL.setCurrentPosition(hardcodedStartPosL);
 }

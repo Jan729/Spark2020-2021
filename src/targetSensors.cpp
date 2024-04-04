@@ -2,22 +2,6 @@
 #include "functions.h"
 #include "global-variables.h"
 
-void incrementLevel() { 
-  level++; 
-
-  int oldTarget = targetLEDPin;
-  
-  targetLEDPin++; // TODO select next target LED from spark PCB
-  targetSensorPin++; // TODO select next IR sensor with mux
-
-  if(level > NUMTARGETS){
-    playingGame = false;
-    winGame = true; //win the game
-  }
-
-  updateLights(oldTarget, targetLEDPin); //TODO: update
-}
-
 void pollIRSensors() {
 
   #if IS_WOKWI_TEST
@@ -43,29 +27,6 @@ void pollIRSensors() {
     targetBroken = false; // TODO replace with Ginny's IR sensor polling logic
     bottomBroken = false; // poll sensor at bottom of the game
   #endif
-
-  if (targetBroken) { //ball fell in good hole
-    Serial.println((String)"Won level " + level);
-    targetBroken = false;
-    wonLevelState = false;
-    resetBarAndBall();
-
-    finishTime = millis();
-
-    displayBonus(bonusScore, targetDifficulty, finishTime);
-    delay(1000);
-    updateScore(curScore, bonusScore, highScore);
-    displayScore(curScoreDisplay, curScore);
-    incrementLevel();
-    
-  } else if (bottomBroken) { //ball fell into the bottom of the backboard without passing through target 
-    playingGame = false;
-    loseGame = true;
-    updateScore(curScore, bonusScore, highScore);
-    displayScore(curScoreDisplay, curScore);
-    ballAtBottomState = false;
-  }
-
 }
 
 bool beamBroken() // FIXME this code is outdated. replace with ginny's mux circuit reading code

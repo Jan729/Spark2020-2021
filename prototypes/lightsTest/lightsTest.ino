@@ -1,3 +1,5 @@
+#define IROFFSET 25
+
 void updateTarget() {
   level++; 
   randomSeed(analogRead(0));
@@ -152,3 +154,4 @@ void setup() {
 void loop() {
     updateTarget();
     updateLights()
+}

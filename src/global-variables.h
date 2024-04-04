@@ -14,9 +14,9 @@
 
 #define BOTTOMPIN 44 // FIXME this sensor at the bottom of the backboard ramp
                      // has not been built
+#define BONUS_DECREASE_INTERVAL_MS 5000
 #define SCOREINCREASE 10
 #define NUMTARGETS 30
-#define IROFFSET 25
 
 #define STARTBUTTONPIN 2
 
@@ -101,7 +101,6 @@ extern int targetHoles[NUMTARGETS]; // stores pin numbers of target LEDs to ligh
 extern volatile bool playingGame; //true if someone is playing, false if game over
 extern bool winGame; 
 extern bool loseGame;
-extern int targetDifficulty;
 extern int level;
 extern int targetLEDPin;
 extern int targetSensorPin;
@@ -121,11 +120,9 @@ extern TM1637Display highScoreDisplay;
 
 
 //global variables for timing 
+extern unsigned long startLevelTime;
 extern unsigned long finishTime;  //time when the ball drops into target hole, resets each round
-extern unsigned long idleTime;
-extern volatile long debounce_time;
-extern volatile long current_button_time;
-extern unsigned long lastBarTime;
+extern unsigned long lastBonusUpdateTime;
 
 //global vars for pins for bar movement
 extern int leftBarInput;
