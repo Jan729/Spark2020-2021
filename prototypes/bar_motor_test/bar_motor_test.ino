@@ -1,18 +1,3 @@
-/*
-jan 30 2024: clockwise stepper rotation = positive accelstepper position = move bar up
-
-measurements from real Remy's backboard
-30.5" from ball return to last hole = 775mm
-7" = 178mm from ball return to start of playing area. not sure where visible area is
-2mm/rev
-178mm / 2 = 89 revs from ball return to start
-388 revs from ball return to last hole
-Guess: 76mm = 38 rev max height difference between L and R ends of bar
-
-  AccelStepper Library Documentation
-  https://www.airspayce.com/mikem/arduino/AccelStepper/classAccelStepper.html
-*/
-
 #include <AccelStepper.h>
 
 #define CEILING 776000           //steps to reach top of playing area

@@ -116,9 +116,25 @@ The lead screws are lubricated. Don't touch them. Myfab has extra lubricant if y
 
 Tip: If you notice a terrible squealing noise after modifying the code, the bar mechanism squeals when the motor is accelerating or decelerating at a *very* slow rate (ie 1 RPM, just before the motor stops to change spin direction). Increase the total acceleration in your code to prevent the AccelStepper library from holding the motor at a low acceleration for more than a fraction of a second. Lubrication does NOT affect the squealing.
 
-###### TODO
+###### TO TEST
 
 The bar should lower itself by a few cm automatically if nobody has touched the controls in the last few seconds. When the next person arrives to play the game, the bar is already at the bottom and they can begin playing a little sooner. It also incentivizes the player to keep playing instead of standing idle.
+
+###### Motor position calculations
+
+- clockwise stepper rotation = positive accelstepper position = move bar up
+
+- 30.5" from ball return to last hole = 775mm
+- 7" = 178mm from ball return to start of playing area. not sure where visible area is
+- 2mm of vertical bar movement per rev
+- 178mm / 2 = 89 revs from ball return to start
+- 388 revs from ball return to last hole
+- Guess: 76mm = 38 rev max height difference between L and R ends of bar
+
+- AccelStepper Library Documentation
+
+  https://www.airspayce.com/mikem/arduino/AccelStepper/classAccelStepper.html
+
 
 ##### Ball return motor
 
@@ -132,7 +148,7 @@ The two joysticks control the right and left sides of the bar, respectively. The
 
 ##### Joystick Wiring
 
-Each joystick direction has a switch connected to a pair of wires. When the joystick moves, the joystick closes the switch, connecting the pair of wires together. We are using an active low setup for both up and down switches. Active low means one wire is connected to ground, and the other goes to the arduino to read for a `LOW` signal. 
+Each joystick direction has a switch connected to a pair of wires. One side is always grounded. The up and down signal wires (yellow/green) for each joystick are twisted together. We are using an active low setup for both up and down switches. Active low means one wire is connected to ground, and the other goes to the arduino to read for a `LOW` signal. 
 
 #### Leds
 
@@ -177,7 +193,14 @@ TL;DR version:
 5. Linux: Install python3-venv as a pre-req for platformio (`sudo apt install python3-venv`)
 6. PlatformIO will look for files in the `src` folder to compile. Click on `src/main.cpp`, then click the checkmark at the bottom of the screen to verify your code (next to the house button)
 7. If you get red squiggles under the `#include` directives, go to PlatformIO Home (house button) > Libraries > search for and install the library to the Spark2020-2021 project
-8. When the compiler shows `SUCCESS`, run the simulation with `ctrl-shift-p` `Wokwi: Start Simulator`
+8. Go to `global-variables.h` and change the directive `IS_WOKWI_TEST` to `true`. This enables print statements and extra buttons for debugging.
+
+
+```
+#define IS_WOKWI_TEST true
+```
+
+9. Click the checkmark (PlatformIO:Build) at the bottom of vscode to compile. When the compiler shows `SUCCESS`, run the simulation with `ctrl-shift-p` `Wokwi: Start Simulator`
 
 #### How to add code to this project
 Put your code in the src/ folder (otherwise the simulator will not find your code).
@@ -214,3 +237,5 @@ To add another file with helper functions:
 2. Click the checkmark (PlatformIO: Build) and the arrow (PlatformIO: Upload) icons to upload the code to an arduino. The arduino will remember the code even if you disconnect the power
 
 3. If you need to run the setup() again, press the little rubber button on the arduino. The arduino will stop whatever it was doing and run the setup() then loop() again.
+
+Tip: If you're running out of RAM on the mega, comment out the print statements, or wrap the prints in `#if IS_WOKWI_TEST` and `#endif` directives
