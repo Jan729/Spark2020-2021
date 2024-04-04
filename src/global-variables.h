@@ -76,10 +76,11 @@ extern int BUILTIN_LED; // connect Led to arduino pin 13
 #define BAR_DOWN_DELAY_S 5
 
 // FOR WOKWI TESTING ONLY:
-#define LOSE_GAME_BUTTON 14
-#define WIN_LEVEL_BUTTON 15
+#define TEST_LOSE_GAME_BUTTON 14
+#define TEST_WIN_LEVEL_BUTTON 15
 
-#define NUM_IR_SAMPLES 10 // @ginny please adjust as you see fit
+#define NUM_IR_SAMPLES 10 // TODO please adjust as you see fit
+
 /************END OF CONSTANTS*********************/
 
 /************GLOBAL VARIABLE DEFINITIONS **********************/
@@ -94,7 +95,7 @@ extern Adafruit_MCP23X17 mcp6;
 extern Adafruit_MCP23X17 mcp7;
 extern Adafruit_MCP23X17 mcp8;
 
-extern RunningAverage targetIRBuffer; // stores IR sensor data
+extern RunningAverage targetIRBuffer; // stores IR sensor data?
 extern int targetHoles[NUMTARGETS]; // stores pin numbers of target LEDs to light up
 
 extern volatile bool playingGame; //true if someone is playing, false if game over

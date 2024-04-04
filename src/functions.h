@@ -11,7 +11,10 @@ bool checkPassingTime();
 
 bool beamBroken();
 void pollIRSensors();
-void pollBarJoysticks();
+void calibrateBarPosition();
+void pollLeftJoystick();
+void pollRightJoystick();
+void setupBarMotors();
 void moveBar();
 void moveBarDown();
 void resetBarAndBall();

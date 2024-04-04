@@ -3,11 +3,15 @@
 #include "global-variables.h"
 #include <AccelStepper.h>
 
+  // FIXME calibrate bar if powered off display and bar is in an unknown position
+  // rn the bar position is hardcoded during code upload
+void calibrateBarPosition() {
+  long hardcodedStartPos = CEILING/2;
+  motorR.setCurrentPosition(hardcodedStartPos);
+  motorL.setCurrentPosition(hardcodedStartPos);
+}
+
 void setupBarMotors() {
-  long startPos = CEILING/2;
-  motorR.setCurrentPosition(startPos);
-  motorL.setCurrentPosition(startPos);
-  
   motorR.setMaxSpeed(MAX_STEPS_PER_SEC);
   motorL.setMaxSpeed(MAX_STEPS_PER_SEC);
 
@@ -16,11 +20,6 @@ void setupBarMotors() {
 
   motorR.setAcceleration(MAX_STEPS_PER_S_SQUARED);
   motorL.setAcceleration(MAX_STEPS_PER_S_SQUARED);
-
-  pinMode(JOYSTICK_R_DOWN, INPUT_PULLUP);
-  pinMode(JOYSTICK_R_UP, INPUT_PULLUP);
-  pinMode(JOYSTICK_L_DOWN, INPUT_PULLUP);
-  pinMode(JOYSTICK_L_UP, INPUT_PULLUP);
 }
 
 void pollLeftJoystick() {
@@ -86,7 +85,6 @@ void moveBarRight() {
       long positionCorrection = changingDirections ? LOOK_AHEAD_STEPS : 0;
       motorR.moveTo(barPosR-STEPS_PER_CALL-positionCorrection);
     }
-
 }
 
 void moveBar()
@@ -109,7 +107,7 @@ void moveBar()
     }
 
     if (checkPassingTime()) {
-      //  moveBarDown();
+      moveBarDown();
     }
 }
 

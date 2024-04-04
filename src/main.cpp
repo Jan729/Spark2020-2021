@@ -105,7 +105,8 @@ void waitToStartGame() {
 }
 
 void resetGame(){
-  // TODO calibrate bar if powered off display and bar is in an uknown position
+  calibrateBarPosition();
+  
   resetAllVariables();
   resetBarAndBall();
 
@@ -141,6 +142,13 @@ void startButtonPressed() {
   playingGame = !playingGame;
 }
 
+void setupJoystickPins() {
+  pinMode(JOYSTICK_R_UP, INPUT_PULLUP);
+  pinMode(JOYSTICK_R_DOWN, INPUT_PULLUP);
+  pinMode(JOYSTICK_L_UP, INPUT_PULLUP);
+  pinMode(JOYSTICK_L_DOWN, INPUT_PULLUP);
+}
+
 /****** END OF GAME CONTROL FUNCTIONS ****/
 
 /**********END OF HELPER FUNCTION IMPLEMENTATIONS******/
@@ -151,8 +159,8 @@ void setup() {
 
   #if IS_WOKWI_TEST
 
-    pinMode(WIN_LEVEL_BUTTON, INPUT_PULLUP);
-    pinMode(LOSE_GAME_BUTTON, INPUT_PULLUP);
+    pinMode(TEST_WIN_LEVEL_BUTTON, INPUT_PULLUP);
+    pinMode(TEST_LOSE_GAME_BUTTON, INPUT_PULLUP);
   #endif
 
   // TODO initialize spark pcb
@@ -162,21 +170,16 @@ void setup() {
   pinMode(STARTBUTTONPIN, INPUT_PULLUP);  //Start button, LOW when pressed
   attachInterrupt(digitalPinToInterrupt(STARTBUTTONPIN), startButtonPressed, FALLING);
 
-  // Game Input Buttons to Move Bar 
-  pinMode(JOYSTICK_R_UP, INPUT_PULLUP);
-  pinMode(JOYSTICK_R_DOWN, INPUT_PULLUP);
-  pinMode(JOYSTICK_L_UP, INPUT_PULLUP);
-  pinMode(JOYSTICK_L_DOWN, INPUT_PULLUP);
+  // Game Input Buttons to Move Bar
+  setupJoystickPins();
 
-  pinMode(11, OUTPUT); //IR LEDs. keep on at all times
-  pinMode(12, OUTPUT);
+  //TODO keep IR emitters on at all times? is that too much current?
 
-  // set up hex displays
   setHexDisplayBrightness();
+  setupBarMotors();
 }
 
 void loop() {
-
   waitToStartGame(); 
   resetGame();
   Serial.println("Game starts!");

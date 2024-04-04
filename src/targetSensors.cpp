@@ -21,8 +21,8 @@ void incrementLevel() {
 void pollIRSensors() {
 
   #if IS_WOKWI_TEST
-    bool wonLevel = digitalRead(WIN_LEVEL_BUTTON) == LOW;
-    bool ballAtBottom = digitalRead(LOSE_GAME_BUTTON) == LOW;
+    bool wonLevel = digitalRead(TEST_WIN_LEVEL_BUTTON) == LOW;
+    bool ballAtBottom = digitalRead(TEST_LOSE_GAME_BUTTON) == LOW;
     
     // catch rising edge of test buttons
     if (wonLevel && !wonLevelState) {
@@ -68,7 +68,7 @@ void pollIRSensors() {
 
 }
 
-bool beamBroken() // FIXME this code is outdated
+bool beamBroken() // FIXME this code is outdated. replace with ginny's mux circuit reading code
 {
 
   // bool beamBroke = false;
