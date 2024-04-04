@@ -6,9 +6,10 @@
   // FIXME calibrate bar if powered off display and bar is in an unknown position
   // rn the bar position is hardcoded during code upload
 void calibrateBarPosition() {
-  long hardcodedStartPos = CEILING/2;
-  motorR.setCurrentPosition(hardcodedStartPos);
-  motorL.setCurrentPosition(hardcodedStartPos);
+  long hardcodedStartPosR = FLOOR;
+  long hardcodedStartPosL = FLOOR;
+  motorR.setCurrentPosition(hardcodedStartPosR);
+  motorL.setCurrentPosition(hardcodedStartPosL);
 }
 
 void setupBarMotors() {
@@ -106,27 +107,45 @@ void moveBar()
         moveBarLeft();
     }
 
-    if (checkPassingTime()) {
+    if (playerIsIdle()) {
       moveBarDown();
     }
 }
 
+void moveBarBlocking(long leftPos, long rightPos) {
+  motorL.moveTo(leftPos);
+  motorR.moveTo(rightPos);
+
+  while(motorR.run() || motorL.run()) {
+    motorR.run();
+    motorL.run();
+  }
+}
+
 void resetBarAndBall()
 {
+  #if IS_WOKWI_TEST
+  Serial.println("resetting bar and ball...");
+  #endif
+
   // TODO hardcode the bar to dump any leftover ball into backboard
 
-  motorL.moveTo(BALL_RETURN_HEIGHT);
-  motorR.moveTo(BALL_RETURN_HEIGHT);
+  moveBarBlocking(BALL_RETURN_HEIGHT, BALL_RETURN_HEIGHT);
 
   resetBall();
 
-  motorL.moveTo(FLOOR);
-  motorR.moveTo(FLOOR);
+  moveBarBlocking(FLOOR, FLOOR);
+
+  #if IS_WOKWI_TEST
+  Serial.println("done resetting bar and ball");
+  #endif
 }
 
 void resetBall() { 
   // IMPLEMENT ME
-  Serial.println("reset ball");
+  #if IS_WOKWI_TEST
+  Serial.println("loading ball...");
+  #endif
 }
 
 void moveBarDown() {
@@ -134,10 +153,12 @@ void moveBarDown() {
   long barPosL = motorL.currentPosition(); 
   lastBarTime = millis();
   if (barPosR-STEPS_PER_CALL > FLOOR) {
-      motorR.moveTo(barPosR-STEPS_PER_CALL);
+    barPosR = barPosR-STEPS_PER_CALL;
   }
 
   if (barPosL-STEPS_PER_CALL > FLOOR) {
-       motorL.moveTo(barPosL-STEPS_PER_CALL);
+    barPosL = barPosL-STEPS_PER_CALL;
   }
+
+  moveBarBlocking(barPosL, barPosR);
 }

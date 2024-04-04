@@ -234,8 +234,12 @@ To add another file with helper functions:
 #define IS_WOKWI_TEST false
 ```
 
-2. Click the checkmark (PlatformIO: Build) and the arrow (PlatformIO: Upload) icons to upload the code to an arduino. The arduino will remember the code even if you disconnect the power
+2. **IMPORTANT** - If you have not stored the bar motors' last positions in non-volatile memory, estimate the position of the left and right bar motors. CEILING is the top of the backboard. FLOOR is just below hole #1. Hardcode the positions into `calibrateBarPosition()`
 
-3. If you need to run the setup() again, press the little rubber button on the arduino. The arduino will stop whatever it was doing and run the setup() then loop() again.
+**If you don't set the motor positions before uploading the code, the motors might break the bar :O**
+
+3. Click the checkmark (PlatformIO: Build) and the arrow (PlatformIO: Upload) icons to upload the code to an arduino. The arduino will remember the code even if you disconnect the power
+
+4. If you need to run the setup() again, press the little rubber button on the arduino. The arduino will stop whatever it was doing and run the setup() then loop() again.
 
 Tip: If you're running out of RAM on the mega, comment out the print statements, or wrap the prints in `#if IS_WOKWI_TEST` and `#endif` directives

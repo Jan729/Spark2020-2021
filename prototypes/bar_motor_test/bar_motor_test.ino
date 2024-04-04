@@ -141,12 +141,12 @@ void moveBar()
         moveBarLeft();
     }
 
-    if (checkPassingTime()) {
+    if (playerIsIdle()) {
       //  moveBarDown();
     }
 }
 
-bool checkPassingTime(){
+bool playerIsIdle(){
   unsigned long currentTime = millis();
   unsigned long passingTime = currentTime  - lastBarTime;
   return passingTime/1000 > BAR_DOWN_DELAY_S;

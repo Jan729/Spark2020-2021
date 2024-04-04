@@ -7,7 +7,7 @@ void resetAllVariables();
 void incrementLevel();
 void resetBall();
 void resetGame();
-bool checkPassingTime();
+bool playerIsIdle();
 
 bool beamBroken();
 void pollIRSensors();

@@ -112,12 +112,13 @@ void resetGame(){
 
   resetScores();
   digitalWrite(targetLEDPin, HIGH);
+
 }
 
-bool checkPassingTime(){
+bool playerIsIdle(){
   unsigned long currentTime = millis();
-  unsigned long passingTime = currentTime  - lastBarTime;
-  return passingTime/1000 > BAR_DOWN_DELAY_S;
+  unsigned long joysticksIdleMs = currentTime  - lastBarTime;
+  return joysticksIdleMs/1000 > BAR_DOWN_DELAY_S;
 }
 
 //ISR for start/stop game button only to change gameState
@@ -191,7 +192,7 @@ void loop() {
 
     pollIRSensors(); // newTarget, winGame, loseGame is decided here. score is updated here too
     
-    if (checkPassingTime()) {
+    if (playerIsIdle()) {
       lastBarTime = millis();
       moveBarDown();
     }
