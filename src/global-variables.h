@@ -104,8 +104,8 @@ extern bool loseGame;
 extern int level;
 extern int targetLEDPin;
 extern int targetSensorPin;
-extern bool targetBroken;
-extern bool bottomBroken;
+extern bool wonLevel;
+extern bool ballFellIntoBackboard;
 extern bool wonLevelState;
 extern bool ballAtBottomState;
 

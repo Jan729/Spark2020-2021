@@ -5,27 +5,28 @@
 void pollIRSensors() {
 
   #if IS_WOKWI_TEST
-    bool wonLevel = digitalRead(TEST_WIN_LEVEL_BUTTON) == LOW;
-    bool ballAtBottom = digitalRead(TEST_LOSE_GAME_BUTTON) == LOW;
-    
-    // catch rising edge of test buttons
-    if (wonLevel && !wonLevelState) {
-      wonLevelState = true;
-    } else if (!wonLevel && wonLevelState) {
-      wonLevelState = false;
+    bool wonLevelButton = digitalRead(TEST_WIN_LEVEL_BUTTON) == LOW;
+    bool loseButton = digitalRead(TEST_LOSE_GAME_BUTTON) == LOW;
+
+    static bool prevWonLevelState = false;
+    static bool prevBallAtBottomState = false;
+
+    if (wonLevelButton && !prevWonLevelState) {
+      wonLevel = true;
+      prevWonLevelState = true;
+    } else if (!wonLevelButton) {
+      prevWonLevelState = false;
     }
-    
-    if (ballAtBottom && !ballAtBottomState) {
-      ballAtBottomState = true;
-    } else if (!ballAtBottom && ballAtBottom) {
-      ballAtBottomState = false;
+
+    if (loseButton && !prevBallAtBottomState) {
+      ballFellIntoBackboard = true;
+      prevBallAtBottomState = true;
+    } else if (!loseButton) {
+      prevBallAtBottomState = false;
     }
-    
-    targetBroken = wonLevelState;
-    bottomBroken = ballAtBottomState;
   #else
-    targetBroken = false; // TODO replace with Ginny's IR sensor polling logic
-    bottomBroken = false; // poll sensor at bottom of the game
+    wonLevel = false; // TODO replace with Ginny's IR sensor polling logic
+    ballFellIntoBackboard = false; // poll sensor at bottom of the game
   #endif
 }
 

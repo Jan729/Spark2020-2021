@@ -32,10 +32,10 @@ void updateBonus(unsigned long timeNow) {
   displayScore(bonusScoreDisplay, bonusScore);
 }
 
-void updateScore() { // after every round, update current score with bonus score
+void updateScore() {
   curScore += bonusScore;
   displayScore(curScoreDisplay, curScore);
-  sethighScore(curScore, highScore); // check if high score has been surpassed
+  sethighScore(); // check if high score has been surpassed
 }
 
 void displayScore(TM1637Display display, int score) {
@@ -45,8 +45,8 @@ void displayScore(TM1637Display display, int score) {
 void retrieveHighScore() {
   // TODO:  retrieve high score from non volatile memory
 }
-void sethighScore(int curScore, int highScore) {
-  if (curScore > highScore) {      // if high score is updated, blink new high score 3 times
+void sethighScore() {
+  if (curScore > highScore) {
     highScore = curScore;
     highScoreDisplay.clear();
     delay(250);
@@ -83,7 +83,7 @@ void displayLoseMessage() { // display "OOPS" if game is lost
     displayScore(curScoreDisplay, curScore);
 }
 
-void displayWinMessage() { // display "WIN" if game is won... a little sketchy but best i can do
+void displayWinMessage() { // display "WIN" if game is won
     uint8_t win[] = {
     SEG_C | SEG_D | SEG_E | SEG_F, // w first half
     SEG_B | SEG_C | SEG_D | SEG_E, // w second half

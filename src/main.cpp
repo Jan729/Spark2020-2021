@@ -31,8 +31,8 @@ bool loseGame;
 int level;
 int targetLEDPin;
 int targetSensorPin;
-bool targetBroken;
-bool bottomBroken;
+bool wonLevel;
+bool ballFellIntoBackboard;
 
 // hex display variables
 int bonusScore;
@@ -60,43 +60,30 @@ SevSeg sevseg3;
 
 // main loop control variables
 volatile bool playingGame = false; //true if someone is playing, false if game over
-bool wonLevelState = false;
-bool ballAtBottomState = false;
 
 /************END OF LOCAL DECLARATIONS**********************/
 
 /****** GAME CONTROL FUNCTIONS ****/
 
 void setupNextLevel() {
-  finishTime = millis();
-
-  updateScore();
-  bonusScoreDisplay.clear();
-
   level++;
 
-  if(level > NUMTARGETS) {
-    playingGame = false;
-    winGame = true; //win the game
-  }
-
-  targetBroken = false;
-  bottomBroken = false;
-  wonLevelState = false;
-  ballAtBottomState = false;
+  wonLevel = false;
+  ballFellIntoBackboard = false;
 
   int oldTarget = targetLEDPin;
   targetLEDPin++; // TODO select next target LED from spark PCB
   targetSensorPin++; // TODO select next IR sensor with mux
 
   resetBarAndBall();
-  updateLights(oldTarget, targetLEDPin); //TODO: update
+  updateLights(oldTarget, targetLEDPin); //TODO: update lights on spark PCB
   lastBarTime = millis();
 
   startLevelTime = millis();
   lastBonusUpdateTime = startLevelTime;
   bonusScore = level*100;
   displayScore(bonusScoreDisplay, bonusScore);
+  displayScore(curScoreDisplay, curScore);
 }
 
 void waitToStartGame() { 
@@ -169,6 +156,7 @@ void setup() {
 
   // TODO initialize spark pcb
   // TODO init IR receivers
+  //TODO keep IR emitters on at all times? is that too much current?
   
   //button interrupt
   pinMode(STARTBUTTONPIN, INPUT_PULLUP);  //Start button, LOW when pressed
@@ -177,34 +165,38 @@ void setup() {
   // Game Input Buttons to Move Bar
   setupJoystickPins();
 
-  //TODO keep IR emitters on at all times? is that too much current?
-
   setHexDisplayBrightness();
   setupBarMotors();
 }
 
 void loop() {
+
   waitToStartGame(); 
   resetGame();
   Serial.println("Game starts!");
-  while (playingGame) {
-    //TODO: Work out where to call start and end times (NOT DONE)
-    // finishTime = millis(); //might not need here depending on when incrementLevel is called. 
-    
-    moveBar();
 
+  while (playingGame) {
+    moveBar();
     pollIRSensors();
-        
     updateBonus(millis());
 
-    if (targetBroken) { //ball fell in good hole
+    if (wonLevel) {
       Serial.println((String)"Won level " + level);
-      setupNextLevel();
-      
-    } else if (bottomBroken) { //ball fell into the bottom of the backboard without passing through target 
+
+      finishTime = millis();
+      updateScore();
+      bonusScoreDisplay.clear();
+
+      if(level == NUMTARGETS) {
+        playingGame = false;
+        winGame = true; //win the game
+      } else {
+        setupNextLevel();
+      }
+
+    } else if (ballFellIntoBackboard) {
       playingGame = false;
       loseGame = true;
-
     }
 
     if (playerIsIdle()) {
@@ -213,20 +205,16 @@ void loop() {
     }
   }
 
-  // else wait for someone to start game
+  digitalWrite(targetLEDPin, LOW); 
 
   if (winGame) {
     Serial.println("You win");
-    digitalWrite(targetLEDPin, LOW); 
-    // flashAllTargetLEDs(); //TODO: does this function still work?
     displayWinMessage();
   } else if (loseGame){
     Serial.println("You lose");
-    digitalWrite(targetLEDPin, LOW); 
     displayLoseMessage();
   } else {
-    Serial.println("You were idle or you reset the game");
-    // flashAllTargetLEDs();
+    Serial.println("You reset the game");
   }
 
 }

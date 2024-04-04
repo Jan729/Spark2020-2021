@@ -28,7 +28,7 @@ void updateBonus(unsigned long timeNow);
 void displayScore(TM1637Display display, int score);
 void resetScores();
 void retrieveHighScore();
-void sethighScore(int curScore, int highScore);
+void sethighScore();
 
 void resetScores();
 void flashAllTargetLEDs();
