@@ -200,7 +200,15 @@ TL;DR version:
 #define IS_WOKWI_TEST true
 ```
 
-9. Click the checkmark (PlatformIO:Build) at the bottom of vscode to compile. When the compiler shows `SUCCESS`, run the simulation with `ctrl-shift-p` `Wokwi: Start Simulator`
+9. Click the checkmark (PlatformIO:Build) at the bottom of vscode to compile. When the compiler shows `SUCCESS`, run the simulation with `ctrl-shift-p` `Wokwi: Start Simulator`.
+
+### How to modify wokwi diagram.json
+
+You can edit the diagram.json two ways.
+
+Option 1: Manually edit the diagram.json in vscode by right clicking `diagram.json` >  Open With > Text Editor. Parts are listed in `parts`, and wires are listed in `connections`.
+
+Option 2: Go to wokwi.com, make a New Project, then copy and paste the `diagram.json`. You can then use the web GUI to re-position and copy `parts`. To add `parts` and `connections`, you'll need to manually edit the json file.
 
 #### How to add code to this project
 Put your code in the src/ folder (otherwise the simulator will not find your code).
