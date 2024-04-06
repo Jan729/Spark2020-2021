@@ -1,232 +1,232 @@
 {
-    "version": 1,
-    "author": "Anonymous maker",
-    "editor": "wokwi",
-    "parts": [
-      { "type": "wokwi-arduino-mega", "id": "mega", "top": 125.4, "left": 111.6, "attrs": {} },
-      {
-        "type": "wokwi-pushbutton",
-        "id": "start",
-        "top": -281.8,
-        "left": 624,
-        "attrs": { "color": "red", "bounce": "0" }
-      },
-      {
-        "type": "wokwi-pushbutton",
-        "id": "joystk-r-up",
-        "top": -301,
-        "left": 489.6,
-        "attrs": { "color": "red", "bounce": "0" }
-      },
-      {
-        "type": "wokwi-pushbutton",
-        "id": "joystk-r-down",
-        "top": -253,
-        "left": 489.6,
-        "attrs": { "color": "red", "bounce": "0" }
-      },
-      {
-        "type": "wokwi-pushbutton",
-        "id": "joystk-l-up",
-        "top": -272.2,
-        "left": 336,
-        "attrs": { "color": "red", "bounce": "0" }
-      },
-      {
-        "type": "wokwi-pushbutton",
-        "id": "joystk-l-down",
-        "top": -224.2,
-        "left": 336,
-        "attrs": { "color": "red", "bounce": "0" }
-      },
-      {
-        "type": "wokwi-a4988",
-        "id": "drv1-bar-left",
-        "top": -71.8,
-        "left": -177.2,
-        "rotate": 270,
-        "attrs": {}
-      },
-      {
-        "type": "wokwi-stepper-motor",
-        "id": "stepper-bar-left",
-        "top": -341.09,
-        "left": -258.32,
-        "attrs": { "display": "angle" }
-      },
-      {
-        "type": "wokwi-a4988",
-        "id": "drv2-bar-right",
-        "top": -62.2,
-        "left": 72.4,
-        "rotate": 270,
-        "attrs": {}
-      },
-      {
-        "type": "wokwi-stepper-motor",
-        "id": "stepper-bar-right",
-        "top": -341.09,
-        "left": -8.72,
-        "attrs": { "display": "angle" }
-      },
-      {
-        "type": "wokwi-tm1637-7segment",
-        "id": "sevseg-cur-score",
-        "top": 345.56,
-        "left": 669.43,
-        "attrs": { "color": "red" }
-      },
-      {
-        "type": "wokwi-tm1637-7segment",
-        "id": "sevseg-bonus",
-        "top": 470.36,
-        "left": 669.43,
-        "attrs": { "color": "red" }
-      },
-      {
-        "type": "wokwi-tm1637-7segment",
-        "id": "sevseg-highscore",
-        "top": 575.96,
-        "left": 669.43,
-        "attrs": { "color": "red" }
-      },
-      {
-        "type": "wokwi-text",
-        "id": "no-simulation-available-note",
-        "top": 163.2,
-        "left": -268.8,
-        "attrs": {
-          "text": "Pins for components unavailable in wokwi:\n 1. 24,26,28 - 'Spark' PCB\n2. A15 - Mux data\n3. 46, 48, 50, 47, 49, 51 - Mux select pins"
-        }
-      },
-      {
-        "type": "wokwi-pushbutton",
-        "id": "lose-game-button",
-        "top": -272.2,
-        "left": 921.6,
-        "attrs": { "color": "red", "bounce": "0" }
-      },
-      {
-        "type": "wokwi-text",
-        "id": "lose-game-text",
-        "top": -384,
-        "left": 940.8,
-        "attrs": { "text": "Simulate\n'lose game'" }
-      },
-      {
-        "type": "wokwi-pushbutton",
-        "id": "win-level-button",
-        "top": -272.2,
-        "left": 796.8,
-        "attrs": { "color": "green", "bounce": "0" }
-      },
-      {
-        "type": "wokwi-text",
-        "id": "win-game-text",
-        "top": -384,
-        "left": 806.4,
-        "attrs": { "text": "Simulate\n'win current level'" }
-      },
-      {
-        "type": "wokwi-text",
-        "id": "start-game-text",
-        "top": -364.8,
-        "left": 624,
-        "attrs": { "text": "Start/reset game" }
-      },
-      {
-        "type": "wokwi-text",
-        "id": "right-joystick-text",
-        "top": -412.8,
-        "left": 508.8,
-        "attrs": { "text": "Right 'joystick'\n(up)\n(down)" }
-      },
-      {
-        "type": "wokwi-text",
-        "id": "left-joystick-text",
-        "top": -384,
-        "left": 336,
-        "attrs": { "text": "Left 'joystick'\n(up)\n(down)" }
-      },
-      { "type": "wokwi-74hc595", "id": "sr1", "top": -1.2, "left": 523.84, "attrs": {} },
-      { "type": "wokwi-led", "id": "led1", "top": -90, "left": 624.2, "attrs": { "color": "red" } },
-      { "type": "wokwi-led", "id": "led2", "top": -90, "left": 599.2, "attrs": { "color": "red" } },
-      { "type": "wokwi-led", "id": "led3", "top": -90, "left": 574.2, "attrs": { "color": "red" } },
-      { "type": "wokwi-led", "id": "led4", "top": -90, "left": 549.2, "attrs": { "color": "red" } },
-      { "type": "wokwi-led", "id": "led5", "top": -90, "left": 524.2, "attrs": { "color": "red" } },
-      { "type": "wokwi-led", "id": "led6", "top": -90, "left": 499.2, "attrs": { "color": "red" } },
-      { "type": "wokwi-led", "id": "led7", "top": -90, "left": 474.2, "attrs": { "color": "red" } },
-      { "type": "wokwi-led", "id": "led8", "top": -90, "left": 445.4, "attrs": { "color": "red" } },
-      {
-        "type": "wokwi-text",
-        "id": "led-text",
-        "top": -67.2,
-        "left": 672,
-        "attrs": { "text": "LEDs 1-30 on SPARK PCB with shift registers" }
-      },
-      {
-        "type": "wokwi-text",
-        "id": "start-game-text1",
-        "top": 374.4,
-        "left": 604.8,
-        "attrs": { "text": "Score" }
-      },
-      {
-        "type": "wokwi-text",
-        "id": "start-game-text2",
-        "top": 499.2,
-        "left": 604.8,
-        "attrs": { "text": "Bonus" }
-      },
-      {
-        "type": "wokwi-text",
-        "id": "start-game-text3",
-        "top": 614.4,
-        "left": 576,
-        "attrs": { "text": "Highscore" }
+  "version": 1,
+  "author": "Anonymous maker",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-arduino-mega", "id": "mega", "top": 125.4, "left": 111.6, "attrs": {} },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "start",
+      "top": -281.8,
+      "left": 624,
+      "attrs": { "color": "red", "bounce": "0" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "joystk-r-up",
+      "top": -301,
+      "left": 489.6,
+      "attrs": { "color": "red", "bounce": "0" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "joystk-r-down",
+      "top": -253,
+      "left": 489.6,
+      "attrs": { "color": "red", "bounce": "0" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "joystk-l-up",
+      "top": -272.2,
+      "left": 336,
+      "attrs": { "color": "red", "bounce": "0" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "joystk-l-down",
+      "top": -224.2,
+      "left": 336,
+      "attrs": { "color": "red", "bounce": "0" }
+    },
+    {
+      "type": "wokwi-a4988",
+      "id": "drv1-bar-left",
+      "top": -71.8,
+      "left": -177.2,
+      "rotate": 270,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-stepper-motor",
+      "id": "stepper-bar-left",
+      "top": -341.09,
+      "left": -258.32,
+      "attrs": { "display": "angle" }
+    },
+    {
+      "type": "wokwi-a4988",
+      "id": "drv2-bar-right",
+      "top": -62.2,
+      "left": 72.4,
+      "rotate": 270,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-stepper-motor",
+      "id": "stepper-bar-right",
+      "top": -341.09,
+      "left": -8.72,
+      "attrs": { "display": "angle" }
+    },
+    {
+      "type": "wokwi-tm1637-7segment",
+      "id": "sevseg-cur-score",
+      "top": 345.56,
+      "left": 669.43,
+      "attrs": { "color": "red" }
+    },
+    {
+      "type": "wokwi-tm1637-7segment",
+      "id": "sevseg-bonus",
+      "top": 470.36,
+      "left": 669.43,
+      "attrs": { "color": "red" }
+    },
+    {
+      "type": "wokwi-tm1637-7segment",
+      "id": "sevseg-highscore",
+      "top": 575.96,
+      "left": 669.43,
+      "attrs": { "color": "red" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "no-simulation-available-note",
+      "top": 163.2,
+      "left": -268.8,
+      "attrs": {
+        "text": "Pins for components unavailable in wokwi:\n 1. 24,26,28 - 'Spark' PCB\n2. A15 - Mux data\n3. 46, 48, 50, 47, 49, 51 - Mux select pins"
       }
-    ],
-    "connections": [
-      [ "start:1.l", "mega:GND.1", "black", [ "h-9.6", "v-38.4", "h-383.8" ] ],
-      [ "start:2.r", "mega:2", "violet", [ "h9.8", "v125", "h-351.2" ] ],
-      [ "joystk-r-up:1.l", "mega:GND.1", "black", [ "v-19.2", "h-259.2", "v441.6" ] ],
-      [ "joystk-r-up:2.r", "mega:9", "green", [ "h12.75", "v134.6", "h-229.25" ] ],
-      [ "joystk-r-down:1.l", "mega:GND.1", "black", [ "h-9.6", "v-67.2", "h-249.4" ] ],
-      [ "joystk-r-down:2.r", "mega:10", "blue", [ "h21.18", "v77", "h-247.18" ] ],
-      [ "joystk-l-up:1.l", "mega:GND.1", "black", [ "h-105.6", "v393.6" ] ],
-      [ "joystk-l-up:2.r", "mega:7", "orange", [ "h29", "v86.6", "h-91.7" ] ],
-      [ "joystk-l-down:1.l", "mega:GND.1", "black", [ "h-105.6", "v124.8", "h0.2" ] ],
-      [ "joystk-l-down:2.r", "mega:8", "yellow", [ "h19.4", "v19.4", "h-91.6" ] ],
-      [ "drv1-bar-left:1B", "stepper-bar-left:B-", "black", [ "v0" ] ],
-      [ "drv1-bar-left:1A", "stepper-bar-left:B+", "green", [ "v0" ] ],
-      [ "stepper-bar-left:A+", "drv1-bar-left:2A", "blue", [ "v0" ] ],
-      [ "stepper-bar-left:A-", "drv1-bar-left:2B", "red", [ "v0" ] ],
-      [ "drv1-bar-left:SLEEP", "drv1-bar-left:RESET", "green", [ "v15.92", "h-9.9" ] ],
-      [ "drv1-bar-left:STEP", "mega:3", "purple", [ "v124.8", "h355.9" ] ],
-      [ "drv1-bar-left:DIR", "mega:4", "#8f4814", [ "v115.2", "h336.3" ] ],
-      [ "drv2-bar-right:1B", "stepper-bar-right:B-", "black", [ "v0" ] ],
-      [ "drv2-bar-right:1A", "stepper-bar-right:B+", "green", [ "v0" ] ],
-      [ "stepper-bar-right:A+", "drv2-bar-right:2A", "blue", [ "v0" ] ],
-      [ "stepper-bar-right:A-", "drv2-bar-right:2B", "red", [ "v0" ] ],
-      [ "drv2-bar-right:SLEEP", "drv2-bar-right:RESET", "green", [ "v15.92", "h-9.9" ] ],
-      [ "drv2-bar-right:STEP", "mega:5", "pink", [ "v86.4", "h196.3" ] ],
-      [ "drv2-bar-right:DIR", "mega:6", "white", [ "v76.8", "h177.2" ] ],
-      [ "sevseg-cur-score:CLK", "mega:32", "orange", [ "h326.4", "v-173.9" ] ],
-      [ "sevseg-cur-score:DIO", "mega:34", "yellow", [ "h316.8", "v-174" ] ],
-      [ "sevseg-cur-score:VCC", "mega:5V", "red", [ "h28.8", "v-57.6", "h-597.5" ] ],
-      [ "sevseg-cur-score:GND", "mega:GND.2", "black", [ "h38.4", "v-76.8", "h-597.35" ] ],
-      [ "sevseg-bonus:CLK", "mega:36", "pink", [ "h336", "v-289.3" ] ],
-      [ "sevseg-bonus:DIO", "mega:38", "white", [ "h345.6", "v-289.15" ] ],
-      [ "sevseg-bonus:VCC", "mega:5V", "red", [ "h28.8", "v-182.4", "h-597.5" ] ],
-      [ "sevseg-bonus:GND", "mega:GND.2", "black", [ "h38.4", "v-201.6", "h-597.35" ] ],
-      [ "sevseg-highscore:CLK", "mega:40", "purple", [ "h374.4", "v-289.1" ] ],
-      [ "sevseg-highscore:DIO", "mega:42", "blue", [ "h364.8", "v-269.95" ] ],
-      [ "sevseg-highscore:VCC", "mega:5V", "red", [ "h28.8", "v-288", "h-597.5" ] ],
-      [ "sevseg-highscore:GND", "mega:GND.2", "black", [ "h38.4", "v-307.2", "h-597.35" ] ],
-      [ "lose-game-button:1.l", "mega:GND.1", "black", [ "v-48", "h-691" ] ],
-      [ "lose-game-button:2.r", "mega:14", "white", [ "h12.75", "v134.6", "h-619.25" ] ],
-      [ "win-level-button:1.l", "mega:GND.1", "black", [ "v-48", "h-566.2" ] ],
-      [ "win-level-button:2.r", "mega:15", "green", [ "h9.8", "v125", "h-482" ] ]
-    ],
-    "dependencies": {}
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "lose-game-button",
+      "top": -272.2,
+      "left": 921.6,
+      "attrs": { "color": "red", "bounce": "0" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "lose-game-text",
+      "top": -384,
+      "left": 940.8,
+      "attrs": { "text": "Simulate\n'lose game'" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "win-level-button",
+      "top": -272.2,
+      "left": 796.8,
+      "attrs": { "color": "green", "bounce": "0" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "win-game-text",
+      "top": -384,
+      "left": 806.4,
+      "attrs": { "text": "Simulate\n'win current level'" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "start-game-text",
+      "top": -364.8,
+      "left": 624,
+      "attrs": { "text": "Start/reset game" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "right-joystick-text",
+      "top": -412.8,
+      "left": 508.8,
+      "attrs": { "text": "Right 'joystick'\n(up)\n(down)" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "left-joystick-text",
+      "top": -384,
+      "left": 336,
+      "attrs": { "text": "Left 'joystick'\n(up)\n(down)" }
+    },
+    { "type": "wokwi-74hc595", "id": "sr1", "top": -1.2, "left": 523.84, "attrs": {} },
+    { "type": "wokwi-led", "id": "led1", "top": -90, "left": 624.2, "attrs": { "color": "red" } },
+    { "type": "wokwi-led", "id": "led2", "top": -90, "left": 599.2, "attrs": { "color": "red" } },
+    { "type": "wokwi-led", "id": "led3", "top": -90, "left": 574.2, "attrs": { "color": "red" } },
+    { "type": "wokwi-led", "id": "led4", "top": -90, "left": 549.2, "attrs": { "color": "red" } },
+    { "type": "wokwi-led", "id": "led5", "top": -90, "left": 524.2, "attrs": { "color": "red" } },
+    { "type": "wokwi-led", "id": "led6", "top": -90, "left": 499.2, "attrs": { "color": "red" } },
+    { "type": "wokwi-led", "id": "led7", "top": -90, "left": 474.2, "attrs": { "color": "red" } },
+    { "type": "wokwi-led", "id": "led8", "top": -90, "left": 445.4, "attrs": { "color": "red" } },
+    {
+      "type": "wokwi-text",
+      "id": "led-text",
+      "top": -67.2,
+      "left": 672,
+      "attrs": { "text": "LEDs 1-30 on SPARK PCB with shift registers" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "start-game-text1",
+      "top": 374.4,
+      "left": 604.8,
+      "attrs": { "text": "Score" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "start-game-text2",
+      "top": 499.2,
+      "left": 604.8,
+      "attrs": { "text": "Bonus" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "start-game-text3",
+      "top": 614.4,
+      "left": 576,
+      "attrs": { "text": "Highscore" }
+    }
+  ],
+  "connections": [
+    [ "start:1.l", "mega:GND.1", "black", [ "h-9.6", "v-38.4", "h-383.8" ] ],
+    [ "start:2.r", "mega:2", "violet", [ "h9.8", "v125", "h-351.2" ] ],
+    [ "joystk-r-up:1.l", "mega:GND.1", "black", [ "v-19.2", "h-259.2", "v441.6" ] ],
+    [ "joystk-r-up:2.r", "mega:9", "green", [ "h12.75", "v134.6", "h-229.25" ] ],
+    [ "joystk-r-down:1.l", "mega:GND.1", "black", [ "h-9.6", "v-67.2", "h-249.4" ] ],
+    [ "joystk-r-down:2.r", "mega:10", "blue", [ "h21.18", "v77", "h-247.18" ] ],
+    [ "joystk-l-up:1.l", "mega:GND.1", "black", [ "h-105.6", "v393.6" ] ],
+    [ "joystk-l-up:2.r", "mega:7", "orange", [ "h29", "v86.6", "h-91.7" ] ],
+    [ "joystk-l-down:1.l", "mega:GND.1", "black", [ "h-105.6", "v124.8", "h0.2" ] ],
+    [ "joystk-l-down:2.r", "mega:8", "yellow", [ "h19.4", "v19.4", "h-91.6" ] ],
+    [ "drv1-bar-left:1B", "stepper-bar-left:B-", "black", [ "v0" ] ],
+    [ "drv1-bar-left:1A", "stepper-bar-left:B+", "green", [ "v0" ] ],
+    [ "stepper-bar-left:A+", "drv1-bar-left:2A", "blue", [ "v0" ] ],
+    [ "stepper-bar-left:A-", "drv1-bar-left:2B", "red", [ "v0" ] ],
+    [ "drv1-bar-left:SLEEP", "drv1-bar-left:RESET", "green", [ "v15.92", "h-9.9" ] ],
+    [ "drv1-bar-left:STEP", "mega:3", "purple", [ "v124.8", "h355.9" ] ],
+    [ "drv1-bar-left:DIR", "mega:4", "#8f4814", [ "v115.2", "h336.3" ] ],
+    [ "drv2-bar-right:1B", "stepper-bar-right:B-", "black", [ "v0" ] ],
+    [ "drv2-bar-right:1A", "stepper-bar-right:B+", "green", [ "v0" ] ],
+    [ "stepper-bar-right:A+", "drv2-bar-right:2A", "blue", [ "v0" ] ],
+    [ "stepper-bar-right:A-", "drv2-bar-right:2B", "red", [ "v0" ] ],
+    [ "drv2-bar-right:SLEEP", "drv2-bar-right:RESET", "green", [ "v15.92", "h-9.9" ] ],
+    [ "drv2-bar-right:STEP", "mega:5", "pink", [ "v86.4", "h196.3" ] ],
+    [ "drv2-bar-right:DIR", "mega:6", "white", [ "v76.8", "h177.2" ] ],
+    [ "sevseg-cur-score:CLK", "mega:32", "orange", [ "h326.4", "v-173.9" ] ],
+    [ "sevseg-cur-score:DIO", "mega:34", "yellow", [ "h316.8", "v-174" ] ],
+    [ "sevseg-cur-score:VCC", "mega:5V", "red", [ "h28.8", "v-57.6", "h-597.5" ] ],
+    [ "sevseg-cur-score:GND", "mega:GND.2", "black", [ "h38.4", "v-76.8", "h-597.35" ] ],
+    [ "sevseg-bonus:CLK", "mega:36", "pink", [ "h336", "v-289.3" ] ],
+    [ "sevseg-bonus:DIO", "mega:38", "white", [ "h345.6", "v-289.15" ] ],
+    [ "sevseg-bonus:VCC", "mega:5V", "red", [ "h28.8", "v-182.4", "h-597.5" ] ],
+    [ "sevseg-bonus:GND", "mega:GND.2", "black", [ "h38.4", "v-201.6", "h-597.35" ] ],
+    [ "sevseg-highscore:CLK", "mega:40", "purple", [ "h374.4", "v-289.1" ] ],
+    [ "sevseg-highscore:DIO", "mega:42", "blue", [ "h364.8", "v-269.95" ] ],
+    [ "sevseg-highscore:VCC", "mega:5V", "red", [ "h28.8", "v-288", "h-597.5" ] ],
+    [ "sevseg-highscore:GND", "mega:GND.2", "black", [ "h38.4", "v-307.2", "h-597.35" ] ],
+    [ "lose-game-button:1.l", "mega:GND.1", "black", [ "v-48", "h-691" ] ],
+    [ "lose-game-button:2.r", "mega:14", "white", [ "h12.75", "v134.6", "h-619.25" ] ],
+    [ "win-level-button:1.l", "mega:GND.1", "black", [ "v-48", "h-566.2" ] ],
+    [ "win-level-button:2.r", "mega:15", "green", [ "h9.8", "v125", "h-482" ] ]
+  ],
+  "dependencies": {}
 }
