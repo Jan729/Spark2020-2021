@@ -130,7 +130,7 @@
       {
         "type": "wokwi-text",
         "id": "start-game-text",
-        "top": -336,
+        "top": -364.8,
         "left": 624,
         "attrs": { "text": "Start/reset game" }
       },
@@ -163,6 +163,27 @@
         "top": -67.2,
         "left": 672,
         "attrs": { "text": "LEDs 1-30 on SPARK PCB with shift registers" }
+      },
+      {
+        "type": "wokwi-text",
+        "id": "start-game-text1",
+        "top": 374.4,
+        "left": 604.8,
+        "attrs": { "text": "Score" }
+      },
+      {
+        "type": "wokwi-text",
+        "id": "start-game-text2",
+        "top": 499.2,
+        "left": 604.8,
+        "attrs": { "text": "Bonus" }
+      },
+      {
+        "type": "wokwi-text",
+        "id": "start-game-text3",
+        "top": 614.4,
+        "left": 576,
+        "attrs": { "text": "Highscore" }
       }
     ],
     "connections": [
