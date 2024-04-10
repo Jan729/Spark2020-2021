@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <AccelStepper.h>
 #include "RunningAverage.h"
-#include "SevSeg.h"
 #include "Wire.h"
 #include <Wire.h>
 #include <Adafruit_MCP23X17.h>

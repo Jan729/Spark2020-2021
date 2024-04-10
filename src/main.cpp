@@ -1,7 +1,6 @@
 #include "global-variables.h"
 #include "functions.h"
 #include "RunningAverage.h"
-#include "SevSeg.h"
 #include "Wire.h"
 #include <Wire.h>
 #include <Adafruit_MCP23X17.h>
@@ -53,10 +52,6 @@ AccelStepper motorR = AccelStepper(AccelStepper::DRIVER, STEP_R, DIR_R);
 AccelStepper motorL = AccelStepper(AccelStepper::DRIVER, STEP_L, DIR_L);
 
 // TODO Stepper motorBallReturn = Stepper(STEPS_PER_REV, RESET_MOTOR_STEP, RESET_MOTOR_DIR); 
-
-SevSeg sevseg1;
-SevSeg sevseg2;
-SevSeg sevseg3;
 
 // main loop control variables
 volatile bool playingGame = false; //true if someone is playing, false if game over

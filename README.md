@@ -86,7 +86,6 @@ The mux chip is CD4051B. If you want to simulate it in wokwi, copy the custom ch
 
 [CD4051B Demo](https://wokwi.com/projects/343522915673702994)
 
-
 #### Motors and motor drivers
 
 There are three motors, one to control the left side of the bar, one to control the right side of the bar, and one to operate the cam mechanism that returns the ball to the bar after the ball falls through a hole.
