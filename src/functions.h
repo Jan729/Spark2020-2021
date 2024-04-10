@@ -34,4 +34,11 @@ void resetScores();
 void flashAllTargetLEDs();
 void displayWinMessage();
 void displayLoseMessage();
+
+
+int getHighScoreFromEEPROM();
+void writeHighScoreToEEPROM();
+void writeBarPositionsIntoEEPROM();
+void setBarPositionsFromEEPROM();
+
 /******END OF HELPER FUNCTION PROTOTYPES***************/

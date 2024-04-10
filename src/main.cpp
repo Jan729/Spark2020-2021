@@ -46,8 +46,11 @@ unsigned long lastBonusUpdateTime;
 //global vars for bar movement
 int leftBarInput;
 int rightBarInput;
+long barPosR;
+long barPosL;
 int barTilt;
 unsigned long lastBarTime;
+unsigned long lastBarSaveTime;
 AccelStepper motorR = AccelStepper(AccelStepper::DRIVER, STEP_R, DIR_R);
 AccelStepper motorL = AccelStepper(AccelStepper::DRIVER, STEP_L, DIR_L);
 
@@ -172,13 +175,16 @@ void loop() {
 
   while (playingGame) {
     moveBar();
+
     pollIRSensors();
-    updateBonus(millis());
+
+    unsigned long timeNow = millis();
+    updateBonus(timeNow);
 
     if (wonLevel) {
       Serial.println((String)"Won level " + level);
+      finishTime = timeNow;
 
-      finishTime = millis();
       updateScore();
       bonusScoreDisplay.clear();
 
@@ -197,6 +203,7 @@ void loop() {
     if (playerIsIdle()) {
       lastBarTime = millis();
       moveBarDown();
+      writeBarPositionsIntoEEPROM();
     }
   }
 

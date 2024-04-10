@@ -2,16 +2,22 @@
 #include "functions.h"
 #include "global-variables.h"
 #include <AccelStepper.h>
-
-  // FIXME calibrate bar if powered off display and bar is in an unknown position
-  // rn the bar position is hardcoded during code upload
+  
+  // TODO check if the bar position variables "drift" and become 
+  // inaccurate over time
 void calibrateBarPosition() {
+  // FIXME hardcode the bar's position before you run it the first time
+  // then test the EEPROM code
+  // you can't test the EEPROM code with the simulator
   long hardcodedStartPosR = FLOOR;
   long hardcodedStartPosL = FLOOR;
   barTilt = hardcodedStartPosL - hardcodedStartPosR;
-  
   motorR.setCurrentPosition(hardcodedStartPosR);
   motorL.setCurrentPosition(hardcodedStartPosL);
+
+  // setBarPositionsFromEEPROM();
+  Serial.print(barPosL);
+  lastBarSaveTime = millis();
 }
 
 void setupBarMotors() {
@@ -52,10 +58,6 @@ void pollRightJoystick() {
 }
 
 void moveBarLeft() {
-   long barPosR = motorR.currentPosition();
-   long barPosL = motorL.currentPosition();
-   barTilt = barPosL - barPosR;
-
     if (leftBarInput > 0 && barPosL+STEPS_PER_CALL < CEILING && barTilt < MAX_BAR_TILT)
     { //move left side of bar UP
         bool changingDirections = motorL.distanceToGo() < 0;
@@ -71,11 +73,6 @@ void moveBarLeft() {
 }
 
 void moveBarRight() {
-   long barPosR = motorR.currentPosition();
-   long barPosL = motorL.currentPosition();
-
-    barTilt = barPosL - barPosR;
-
     if (rightBarInput > 0 && barPosR+STEPS_PER_CALL < CEILING && barTilt > -MAX_BAR_TILT)
     { //move right side of bar UP
       bool changingDirections = motorR.distanceToGo() < 0;
@@ -92,6 +89,9 @@ void moveBarRight() {
 
 void moveBar()
 {
+    barPosR = motorR.currentPosition();
+    barPosL = motorL.currentPosition();
+    barTilt = barPosL - barPosR;
     bool rightBarMoving = motorR.distanceToGo() > LOOK_AHEAD_STEPS || motorR.distanceToGo() < -LOOK_AHEAD_STEPS;
     bool leftBarMoving = motorL.distanceToGo() > LOOK_AHEAD_STEPS  || motorL.distanceToGo() < -LOOK_AHEAD_STEPS;
 
@@ -112,6 +112,7 @@ void moveBar()
     if (playerIsIdle()) {
       moveBarDown();
     }
+
 }
 
 void moveBarBlocking(long leftPos, long rightPos) {
@@ -122,6 +123,8 @@ void moveBarBlocking(long leftPos, long rightPos) {
     motorR.run();
     motorL.run();
   }
+  // WARNING If the power disconnects in the middle of the while loop, the position
+  // stored in EEPROM will be wrong
 }
 
 void resetBarAndBall()
@@ -151,8 +154,8 @@ void resetBall() {
 }
 
 void moveBarDown() {
-  long barPosR = motorR.currentPosition();
-  long barPosL = motorL.currentPosition(); 
+  barPosR = motorR.currentPosition();
+  barPosL = motorL.currentPosition(); 
   lastBarTime = millis();
   if (barPosR-STEPS_PER_CALL > FLOOR) {
     barPosR = barPosR-STEPS_PER_CALL;
