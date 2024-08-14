@@ -1,7 +1,6 @@
 #include "global-variables.h"
 #include "functions.h"
 #include "RunningAverage.h"
-#include "SevSeg.h"
 #include "Wire.h"
 #include <Wire.h>
 #include <Adafruit_MCP23X17.h>
@@ -47,16 +46,15 @@ unsigned long lastBonusUpdateTime;
 //global vars for bar movement
 int leftBarInput;
 int rightBarInput;
+long barPosR;
+long barPosL;
 int barTilt;
 unsigned long lastBarTime;
+unsigned long lastBarSaveTime;
 AccelStepper motorR = AccelStepper(AccelStepper::DRIVER, STEP_R, DIR_R);
 AccelStepper motorL = AccelStepper(AccelStepper::DRIVER, STEP_L, DIR_L);
 
 // TODO Stepper motorBallReturn = Stepper(STEPS_PER_REV, RESET_MOTOR_STEP, RESET_MOTOR_DIR); 
-
-SevSeg sevseg1;
-SevSeg sevseg2;
-SevSeg sevseg3;
 
 // main loop control variables
 volatile bool playingGame = false; //true if someone is playing, false if game over
@@ -177,13 +175,16 @@ void loop() {
 
   while (playingGame) {
     moveBar();
+
     pollIRSensors();
-    updateBonus(millis());
+
+    unsigned long timeNow = millis();
+    updateBonus(timeNow);
 
     if (wonLevel) {
       Serial.println((String)"Won level " + level);
+      finishTime = timeNow;
 
-      finishTime = millis();
       updateScore();
       bonusScoreDisplay.clear();
 
@@ -202,6 +203,7 @@ void loop() {
     if (playerIsIdle()) {
       lastBarTime = millis();
       moveBarDown();
+      writeBarPositionsIntoEEPROM();
     }
   }
 

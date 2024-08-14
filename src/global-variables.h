@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <AccelStepper.h>
 #include "RunningAverage.h"
-#include "SevSeg.h"
 #include "Wire.h"
 #include <Wire.h>
 #include <Adafruit_MCP23X17.h>
@@ -74,6 +73,7 @@ extern int BUILTIN_LED; // connect Led to arduino pin 13
 #define STEPS_PER_REV 200
 #define LOOK_AHEAD_STEPS 100
 #define BAR_DOWN_DELAY_S 5
+#define BAR_SAVE_PERIOD_S 3
 
 // FOR WOKWI TESTING ONLY:
 #define TEST_LOSE_GAME_BUTTON 14
@@ -123,15 +123,18 @@ extern TM1637Display highScoreDisplay;
 extern unsigned long startLevelTime;
 extern unsigned long finishTime;  //time when the ball drops into target hole, resets each round
 extern unsigned long lastBonusUpdateTime;
+extern unsigned long lastBarSaveTime;
 
 //global vars for pins for bar movement
 extern int leftBarInput;
 extern int rightBarInput;
-extern int barTilt;
 extern unsigned long lastBarTime;
 extern AccelStepper motorR;
 extern AccelStepper motorL;
 
-
+// to calculate maximum bar tilt
+extern long barPosR;
+extern long barPosL;
+extern int barTilt;
 
 /************END OF GLOBAL DEFINITIONS**********************/

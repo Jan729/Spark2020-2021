@@ -1,3 +1,6 @@
+#include "SevSeg.h"
+#include <Adafruit_MCP23X17.h>
+
 #define IROFFSET 25
 
 void updateTarget() {

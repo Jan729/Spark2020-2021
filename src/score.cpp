@@ -43,8 +43,9 @@ void displayScore(TM1637Display display, int score) {
 }
 
 void retrieveHighScore() {
-  // TODO:  retrieve high score from non volatile memory
+  highScore = getHighScoreFromEEPROM();
 }
+
 void sethighScore() {
   if (curScore > highScore) {
     highScore = curScore;
@@ -60,7 +61,7 @@ void sethighScore() {
     delay(250);
     highScoreDisplay.showNumberDec(highScore, false);
 
-    // TODO: store highscore in non volatile memory 
+    writeHighScoreToEEPROM();
   }
 }
 

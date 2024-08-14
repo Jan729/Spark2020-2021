@@ -86,7 +86,6 @@ The mux chip is CD4051B. If you want to simulate it in wokwi, copy the custom ch
 
 [CD4051B Demo](https://wokwi.com/projects/343522915673702994)
 
-
 #### Motors and motor drivers
 
 There are three motors, one to control the left side of the bar, one to control the right side of the bar, and one to operate the cam mechanism that returns the ball to the bar after the ball falls through a hole.
@@ -172,7 +171,7 @@ These tutorials may help you wire the hex displays:
 2) At the end of each round, the level bonus is added to the current score
 3) At the end of each round, the current score is compared with the highest score such that if the top score has been exceeded, the current player’s score will replace the historic top score
 
-###### TODO
+###### TODO - code written but not tested yet
 
 The all-time high score should be stored in non-volatile memory to prevent loss when unplugging the display.
 
