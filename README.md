@@ -6,7 +6,7 @@
 2. [Build Tips](#build-tips)
 3. [Build Schematics and Tutorials](#build-schematics-and-tutorials)
     - [TODO Power Supply and Pin Count](#todo-power-supply-and-pin-count)
-    - [IR Sensors](#ir-sensors)
+    - [Limit Switches](#limit-switches)
     - [Motors and Motor Drivers](#motors-and-motor-drivers)
     - [Joysticks](#joysticks)
     - [LEDs](#leds)
@@ -20,7 +20,7 @@
 
 Press the Start button to start the game.
 
-The first “target hole” LED, Hole #1, flashes until the ball is dropped into Hole 1, where the IR sensors detect if the ball passed through that hole. If the ball is dropped into Hole 1, the bonus score is added to the current player score, the bar automatically lowers to the bottom, the ball is returned to the bar, and Hole #2 flashes, indicating the start of level 2. The order of the target holes remains the same, from Hole 1, Hole 2, etc until Hole 30. Repeat until you reach hole #30. 
+The first “target hole” LED, Hole #1, flashes until the ball is dropped into Hole 1, where the ~~IR sensors~~ limit switches detect if the ball passed through that hole. If the ball is dropped into Hole 1, the bonus score is added to the current player score, the bar automatically lowers to the bottom, the ball is returned to the bar, and Hole #2 flashes, indicating the start of level 2. The order of the target holes remains the same, from Hole 1, Hole 2, etc until Hole 30. Repeat until you reach hole #30. 
 
 You earn points when you drop the ball into the target hole. Points are added to your player score on the hex display. The faster you complete each level, the more points you earn. See Hex Displays for the score calculation.
 
@@ -47,6 +47,7 @@ Press the Start button at any time to reset the game to level 1.
 ### I/O Diagram
 
 [Click here to view I/O diagram](https://drive.google.com/file/d/1cqpRm-2tPJbcKSMdjFogfon1K79lBqss/view?usp=sharing)
+As of 2025, we use limit switches instead of IR Sensors so ignore IR related diagram.
 
 ### I/O Wiring Explanation
 
@@ -67,7 +68,7 @@ Wall outlet <---------> power supply with exposed 12V port <---> 12V to 3V regul
 
 ##### Overall Arduino Mega Pin Count
 - Motors – Assuming stepper motor for ball return, 6 digital driver pins (step and dir x3 drivers, right bar, left bar, ball return)
-- IR Sensors – 1 analog, 6 digital (for muxes)
+- Limit switches – 1 analog, 6 digital (for muxes)
 - LEDs + Shift Register Select – 3 digital
 - Reset/Start button - 1 digital interrupt pin
 - Left joystick - 2 digital pins (up and down)
@@ -76,7 +77,7 @@ Wall outlet <---------> power supply with exposed 12V port <---> 12V to 3V regul
 
 TOTAL PINS: 6 + 7 + 3 + 1 + 2 + 2 + 4 = 25
 
-#### IR sensors
+#### Limit Switches
 
 Below link is viewable by Spark 2020-2021 exec team:
 
