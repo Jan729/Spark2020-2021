@@ -9,7 +9,7 @@
 #pragma once
 
 /**********CONSTANTS*****************************/
-#define IS_WOKWI_TEST true
+#define IS_WOKWI_TEST false
 
 #define BOTTOMPIN 44 // FIXME this sensor at the bottom of the backboard ramp
                      // has not been built

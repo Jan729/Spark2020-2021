@@ -51,7 +51,7 @@ As of 2025, we use limit switches instead of IR Sensors so ignore IR related dia
 
 ### I/O Wiring Explanation
 
-Walk to the back of the display and face the wires on the backboard. Hole numbers are written in pencil on the backboard wood. The LEFT side contains (1) the LED VCC wires, (2) the IR receiver DATA wires, (3) the IR emitter VCC wires. Some wires that belong to the same node, like the LED VCC wires, are merged together to save wire. The RIGHT side is common ground.
+Walk to the back of the display and face the wires on the backboard. Hole numbers are written in pencil on the backboard wood. The LEFT side contains (1) the LED VCC wires, (2) the limit switch VCC wire the IR receiver DATA wires, (3) the IR emitter VCC wires. Some wires that belong to the same node, like the LED VCC wires, are merged together to save wire. The RIGHT side is common ground.
 
 #### TODO Power Supply and Pin Count
 
