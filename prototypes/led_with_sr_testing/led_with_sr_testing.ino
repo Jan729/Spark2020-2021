@@ -1,19 +1,65 @@
+#define NUM_LEDS 4
+
 int latchPin = 5;  // latch pin of shift register
 int clockPin = 6; // clock pin of shift register
 int dataPin = 4;  // data pin of shift register
 
 byte leds1 = 0;   // each var controls leds in each shift register
 byte leds2 = 0; 
+byte leds3 = 0;
+byte leds4 = 0;
 
+byte* ledsArray[NUM_LEDS] = {&leds1, &leds2, &leds3, &leds4};
+
+void writeLed(int ledNum)
+{
+  // leds1 = 0;  // initialize leds
+  // leds2 = 0;
+  // leds3 = 0;
+  // leds4 = 0;
+  for (int i = 0; i < NUM_LEDS; i++) {
+    *(ledsArray[i]) = 0;
+  }
+
+  int mult = ledNum / 8;
+  int mod = ledNum % 8;
+
+  Serial.println("Mult and mod");
+  Serial.println(mult);
+  Serial.println(mod);
+
+  bitSet(*ledsArray[mult], mod);
+
+  // if (mult == 0)
+  // {
+  //   bitSet(leds1, mod); 
+  // } 
+  // else if (mult == 1)
+  // {
+  //   bitSet(leds2, mod); 
+  // } 
+  // else if (mult == 2)
+  // {
+  //   bitSet(leds3, mod); 
+  // } 
+  // else if (mult == 3)
+  // {
+  //   bitSet(leds4, mod); 
+  // }
+
+  updateShiftRegister();
+}
 
 void setup() 
 {
   Serial.begin(9600);
-  
   // set all the pins of 74HC595 as OUTPUT
   pinMode(latchPin, OUTPUT);
   pinMode(dataPin, OUTPUT);  
   pinMode(clockPin, OUTPUT);
+
+  delay(2000);
+  writeLed(24);
 }
 
 void updateShiftRegister()
@@ -28,41 +74,44 @@ void updateShiftRegister()
 
 void loop() 
 {
-  leds1 = 0;  // initialize leds
-  leds2 = 0;
-  leds3 = 0;
-  leds4 = 0;
-  updateShiftRegister();
-  delay(2000);
+  // leds1 = 0;  // initialize leds
+  // leds2 = 0;
+  // leds3 = 0;
+  // leds4 = 0;
+  // updateShiftRegister();
+  // // delay(1000);
+  // // bitSet(leds1, 0);
+  // // updateShiftRegister();
+  // // delay(1000);
   
-  // turn on a given LED pattern
-  int pattern1[] = {0, 1, 2, 3, 4, 5, 6, 7};
-  int pattern2[] = {0, 1, 2, 3, 4, 5, 6, 7};
-  int pattern3[] = {0, 1, 2, 3, 4, 5, 6, 7};
-  int pattern4[] = {0, 1, 2, 3, 4, 5, 6, 7};
+  // // turn on a given LED pattern
+  // int pattern1[] = {0, 1, 2, 3, 4, 5, 6, 7};
+  // int pattern2[] = {0, 1, 2, 3, 4, 5, 6, 7};
+  // int pattern3[] = {0, 1, 2, 3, 4, 5, 6, 7};
+  // int pattern4[] = {0, 1, 2, 3, 4, 5, 6, 7};
   
-  for (int i = 0; i < sizeof(pattern1)/sizeof(pattern1[0]); i++){
-    bitSet(leds1, pattern1[i]);
-    updateShiftRegister();
-    delay(500);
-  }
+  // for (int i = 0; i < sizeof(pattern1)/sizeof(pattern1[0]); i++){
+  //   bitSet(leds3, 3);
+  //   updateShiftRegister();
+  //   delay(500);
+  // }
   
-  for (int j = 0; j < sizeof(pattern2)/sizeof(pattern2[0]); j++){
-    bitSet(leds2, pattern2[j]);
-    updateShiftRegister();
-     delay(500);
-  }
+  // for (int j = 0; j < sizeof(pattern2)/sizeof(pattern2[0]); j++){
+  //   bitSet(leds2, pattern2[j]);
+  //   updateShiftRegister();
+  //    delay(500);
+  // }
   
-  for (int k = 0; k < sizeof(pattern3)/sizeof(pattern3[0]); k++){
-    bitSet(leds3, pattern3[k]);
-    updateShiftRegister();
-     delay(500);
-  }
+  // for (int k = 0; k < sizeof(pattern3)/sizeof(pattern3[0]); k++){
+  //   bitSet(leds3, pattern3[k]);
+  //   updateShiftRegister();
+  //    delay(500);
+  // }
   
-  for (int l = 0; l < sizeof(pattern4)/sizeof(pattern4[0]); l++){
-    bitSet(leds4, pattern4[l]);
-    updateShiftRegister();
-     delay(500);
-  }
+  // for (int l = 0; l < sizeof(pattern4)/sizeof(pattern4[0]); l++){
+  //   bitSet(leds4, pattern4[l]);
+  //   updateShiftRegister();
+  //    delay(500);
+  // }
 
 }
