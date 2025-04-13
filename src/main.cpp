@@ -6,6 +6,23 @@
 #include <Adafruit_MCP23X17.h>
 #include <avr/interrupt.h>
 #include <AccelStepper.h>
+#include <Wire.h>
+#include <Adafruit_SSD1306.h>
+#include <Adafruit_GFX.h>
+
+#define SCREEN_WIDTH 128  // OLED display width, in pixels
+#define SCREEN_HEIGHT 64  //  OLED display height, in pixels
+// Declaration for an  SSD1306 display connected to I2C (SDA, SCL pins)
+Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+
+void displayText(const char* text) {
+  oled.clearDisplay();       //clear display
+  oled.setTextSize(2);       // text size
+  oled.setTextColor(WHITE);  // text color
+  oled.setCursor(0, 0);      // position to display
+  oled.println(text);
+  oled.display();
+}
 
 /************LOCAL VARIABLE DECLARATIONS **********************/
 // To make a variable global, add it to
