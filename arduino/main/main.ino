@@ -1,25 +1,17 @@
 #include "global-variables.h"
 #include "functions.h"
 #include "RunningAverage.h"
-#include "Adafruit_MCP23X17.h"
+#include "Wire.h"
+#include <Wire.h>
 #include <avr/interrupt.h>
 #include <AccelStepper.h>
 #include <Wire.h>
 
+#define SCREEN_WIDTH 128  // OLED display width, in pixels
+#define SCREEN_HEIGHT 64  //  OLED display height, in pixels
 /************LOCAL VARIABLE DECLARATIONS **********************/
 // To make a variable global, add it to
 // global-variables.h with an extern definition
-
-// spark PCB
-// todo: change these to the correct chip: SN74HC595N
-Adafruit_MCP23X17 mcp1; //shift registers; 8 of them, each with 16 pins
-Adafruit_MCP23X17 mcp2;
-Adafruit_MCP23X17 mcp3;
-Adafruit_MCP23X17 mcp4;
-Adafruit_MCP23X17 mcp5;
-Adafruit_MCP23X17 mcp6;
-Adafruit_MCP23X17 mcp7;
-Adafruit_MCP23X17 mcp8;
 
 RunningAverage targetIRBuffer(NUM_IR_SAMPLES); // stores IR sensor data
 int targetHoles[NUMTARGETS]; // stores pin numbers of target LEDs to light up
@@ -58,22 +50,33 @@ AccelStepper motorL = AccelStepper(AccelStepper::DRIVER, STEP_L, DIR_L);
 // main loop control variables
 volatile bool playingGame = false; //true if someone is playing, false if game over
 
+byte leds1 = 0;
+byte leds2 = 0;
+byte leds3 = 0;
+byte leds4 = 0;
+
+byte* ledsArray[NUM_LEDS] = {&leds1, &leds2, &leds3, &leds4};
+
 /************END OF LOCAL DECLARATIONS**********************/
 
 /****** GAME CONTROL FUNCTIONS ****/
 
 void setupNextLevel() {
   level++;
-
+  updateMux(); // Sets up MUX to poll a select switch
   wonLevel = false;
   ballFellIntoBackboard = false;
 
+  // !!!!!! DO NOT GET RID OF THIS. IF THIS IS REMOVED, IT BREAKS THE CODE
   int oldTarget = targetLEDPin;
+  oldTarget = oldTarget;
+  // *******************************
+
   targetLEDPin++; // TODO select next target LED from spark PCB
   targetSensorPin++; // TODO select next IR sensor with mux
 
   resetBarAndBall();
-  updateLights(oldTarget, targetLEDPin); //TODO: update lights on spark PCB
+  writeLed(targetLEDPin); // This resets the older pin too
   lastBarTime = millis();
 
   startLevelTime = millis();
@@ -137,7 +140,6 @@ void setupJoystickPins() {
   pinMode(JOYSTICK_L_DOWN, INPUT_PULLUP);
 }
 
-bool once = false;
 /****** END OF GAME CONTROL FUNCTIONS ****/
 
 /**********END OF HELPER FUNCTION IMPLEMENTATIONS******/
@@ -159,13 +161,30 @@ void setup() {
   //button interrupt
   pinMode(STARTBUTTONPIN, INPUT_PULLUP);  //Start button, LOW when pressed
   attachInterrupt(digitalPinToInterrupt(STARTBUTTONPIN), startButtonPressed, FALLING);
+  
+  // TODO: Probably move these into their own setup functions and call them here
+  
+  pinMode(MUX_OUT_ANALOG, INPUT);
+  // Set all control pins as outputs
+  pinMode(PARENT_A, OUTPUT);
+  pinMode(PARENT_B, OUTPUT);
+  pinMode(PARENT_C, OUTPUT);
+
+  pinMode(CHILD_S1, OUTPUT);
+  pinMode(CHILD_S2, OUTPUT);
+  pinMode(CHILD_S3, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT); // Debugging
+
+  pinMode(LED_LATCH_PIN, OUTPUT);
+  pinMode(LED_DATA_PIN, OUTPUT);  
+  pinMode(LED_CLOCK_PIN, OUTPUT);
+
 
   // Game Input Buttons to Move Bar
   setupJoystickPins();
-
+  
   setHexDisplayBrightness();
   setupBarMotors();
-
 }
 
 void loop() {
@@ -177,7 +196,7 @@ void loop() {
   while (playingGame) {
     moveBar();
 
-    pollIRSensors();
+    pollMux();
 
     unsigned long timeNow = millis();
     updateBonus(timeNow);

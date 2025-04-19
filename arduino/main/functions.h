@@ -1,6 +1,6 @@
-#include "TM1637Display.h"
 #pragma once
 
+#include "TM1637Display.h"
 /**********HELPER FUNCTION PROTOTYPES******************/
 void waitToStartGame();
 void resetGameVariables();
@@ -11,7 +11,8 @@ void resetGame();
 bool playerIsIdle();
 
 bool beamBroken();
-void pollIRSensors();
+void pollMux();
+void updateMux();
 void calibrateBarPosition();
 void pollLeftJoystick();
 void pollRightJoystick();
@@ -20,7 +21,8 @@ void moveBar();
 void moveBarDown();
 void resetBarAndBall();
 
-void updateLights(int lastHole, int newHole);
+void writeLed(int ledNum);
+void updateShiftRegister();
 
 void setHexDisplayBrightness();
 void updateScore();

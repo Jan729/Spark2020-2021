@@ -1,8 +1,23 @@
 #include <Arduino.h>
 #include "functions.h"
 #include "global-variables.h"
+#include <math.h>
 
-void pollIRSensors() {
+void updateMux() {
+  int parentChannel = floor((level-1)/8);
+  int childChannel = (level-1)%8;
+
+  digitalWrite(PARENT_A, bitRead(parentChannel, 0));
+  digitalWrite(PARENT_B, bitRead(parentChannel, 1));
+  digitalWrite(PARENT_C, bitRead(parentChannel, 2));
+
+  digitalWrite(CHILD_S1, bitRead(childChannel, 0));
+  digitalWrite(CHILD_S2, bitRead(childChannel, 1));
+  digitalWrite(CHILD_S3, bitRead(childChannel, 2));
+
+}
+
+void pollMux() {
 
   #if IS_WOKWI_TEST
     bool wonLevelButton = digitalRead(TEST_WIN_LEVEL_BUTTON) == LOW;
@@ -25,8 +40,24 @@ void pollIRSensors() {
       prevBallAtBottomState = false;
     }
   #else
-    wonLevel = false; // TODO replace with Ginny's IR sensor polling logic
-    ballFellIntoBackboard = false; // poll sensor at bottom of the game
+    int sensorValue = analogRead(MUX_OUT_ANALOG);
+    if (sensorValue > 500) {
+      digitalWrite(LED_BUILTIN, HIGH);
+      delay(10);
+      digitalWrite(LED_BUILTIN, LOW);
+      delay(10);
+      digitalWrite(LED_BUILTIN, HIGH);
+      delay(10);
+      digitalWrite(LED_BUILTIN, LOW);
+      delay(10);
+      digitalWrite(LED_BUILTIN, HIGH);
+      delay(10);
+      digitalWrite(LED_BUILTIN, LOW);
+      wonLevel = true;
+      ballFellIntoBackboard = false; // poll sensor at bottom of the game
+    }
+
+    // TODO: Add logic for checking if ball fell into backboard
   #endif
 }
 

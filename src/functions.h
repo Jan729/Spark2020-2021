@@ -11,7 +11,8 @@ void resetGame();
 bool playerIsIdle();
 
 bool beamBroken();
-void pollIRSensors();
+void pollMux();
+void updateMux();
 void calibrateBarPosition();
 void pollLeftJoystick();
 void pollRightJoystick();
@@ -20,7 +21,7 @@ void moveBar();
 void moveBarDown();
 void resetBarAndBall();
 
-void updateLights(int lastHole, int newHole);
+void writeLed(int ledNum);
 
 void setHexDisplayBrightness();
 void updateScore();

@@ -1,12 +1,14 @@
+#pragma once
+
 #include <Arduino.h>
 #include <AccelStepper.h>
 #include "RunningAverage.h"
 #include "Wire.h"
 #include <Wire.h>
-#include <Adafruit_MCP23X17.h>
+#include "Adafruit_MCP23X17.h"
 #include <avr/interrupt.h>
 #include "TM1637Display.h"
-#pragma once
+
 
 /**********CONSTANTS*****************************/
 #define IS_WOKWI_TEST false
@@ -16,6 +18,7 @@
 #define BONUS_DECREASE_INTERVAL_MS 5000
 #define SCOREINCREASE 10
 #define NUMTARGETS 30
+#define NUM_LEDS 4
 
 #define STARTBUTTONPIN 2
 
@@ -28,6 +31,19 @@
 #define JOYSTICK_L_DOWN 8
 #define JOYSTICK_R_UP 9
 #define JOYSTICK_R_DOWN 10
+
+#define PARENT_A 11
+#define PARENT_B 12
+#define PARENT_C 13
+#define CHILD_S1 14
+#define CHILD_S2 15
+#define CHILD_S3 16
+
+#define MUX_OUT_ANALOG A1 // Analog input to read the selected mux output
+
+#define LED_LATCH_PIN 17  // latch pin of shift register
+#define LED_CLOCK_PIN 18 // clock pin of shift register
+#define LED_DATA_PIN 19 // data pin of shift register
 
 // TODO ball return stepper pins
 // #define RESET_MOTOR_STEP 11
@@ -84,20 +100,6 @@ extern int BUILTIN_LED; // connect Led to arduino pin 13
 /************END OF CONSTANTS*********************/
 
 /************GLOBAL VARIABLE DEFINITIONS **********************/
-// spark PCB
-// todo: change these to the correct chip: SN74HC595N?
-extern Adafruit_MCP23X17 mcp1; //shift registers; 8 of them, each with 16 pins
-extern Adafruit_MCP23X17 mcp2;
-extern Adafruit_MCP23X17 mcp3;
-extern Adafruit_MCP23X17 mcp4;
-extern Adafruit_MCP23X17 mcp5;
-extern Adafruit_MCP23X17 mcp6;
-extern Adafruit_MCP23X17 mcp7;
-extern Adafruit_MCP23X17 mcp8;
-
-extern RunningAverage targetIRBuffer; // stores IR sensor data?
-extern int targetHoles[NUMTARGETS]; // stores pin numbers of target LEDs to light up
-
 extern volatile bool playingGame; //true if someone is playing, false if game over
 extern bool winGame; 
 extern bool loseGame;
@@ -136,5 +138,14 @@ extern AccelStepper motorL;
 extern long barPosR;
 extern long barPosL;
 extern int barTilt;
+
+// Global variables for LEDs/shift registers
+
+extern byte leds1;   // each var controls leds in each shift register
+extern byte leds2; 
+extern byte leds3;
+extern byte leds4;
+
+extern byte* ledsArray[NUM_LEDS];
 
 /************END OF GLOBAL DEFINITIONS**********************/
